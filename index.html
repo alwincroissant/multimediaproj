@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ITCI231: Multimedia and Authoring</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #11202f;
+      --muted: #4f6275;
+      --paper: #f7f3ec;
+      --panel: rgba(255, 255, 255, 0.74);
+      --line: rgba(17, 32, 47, 0.14);
+      --rose: #ff7262;
+      --sky: #4fa7ff;
+      --mint: #2dc3a4;
+      --shadow: 0 22px 48px rgba(17, 32, 47, 0.16);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Manrope", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 12%, rgba(255, 114, 98, 0.2), transparent 28%),
+        radial-gradient(circle at 92% 16%, rgba(79, 167, 255, 0.22), transparent 28%),
+        linear-gradient(150deg, #f7f3ec 0%, #f9f8f4 45%, #f0fbff 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .bg-noise {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image: radial-gradient(rgba(17, 32, 47, 0.06) 0.45px, transparent 0.45px);
+      background-size: 8px 8px;
+      opacity: 0.35;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 1.1rem;
+      z-index: 100;
+      width: min(940px, calc(100% - 2rem));
+      margin: 1.1rem auto 0;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 22px rgba(17, 32, 47, 0.1);
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.55rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.48rem 1rem;
+      border-radius: 999px;
+      transition: transform 0.25s ease, background-color 0.25s ease;
+    }
+
+    .nav-links a:hover {
+      transform: translateY(-2px);
+      background: rgba(79, 167, 255, 0.12);
+    }
+
+    .intro-wrapper {
+      width: min(1020px, calc(100% - 2rem));
+      margin: 4.2rem auto 2.4rem;
+      text-align: center;
+      animation: enter 0.8s ease both;
+    }
+
+    .intro-wrapper h1 {
+      font-family: "Fraunces", serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      letter-spacing: 0.01em;
+    }
+
+    .title-gradient {
+      color: transparent;
+      background: linear-gradient(110deg, var(--rose), var(--sky), var(--mint));
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .intro-wrapper p {
+      max-width: 760px;
+      margin: 0 auto;
+      font-size: 1.06rem;
+      color: var(--muted);
+    }
+
+    .split-container {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 1.5rem auto 4rem;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.15rem;
+      flex: 1;
+      animation: enter 0.8s 0.15s ease both;
+    }
+
+    .split-pane {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      padding: clamp(1.2rem, 3.8vw, 2.4rem);
+      overflow: hidden;
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .split-pane::after {
+      content: "";
+      position: absolute;
+      width: 230px;
+      height: 230px;
+      border-radius: 50%;
+      right: -75px;
+      top: -78px;
+      opacity: 0.85;
+    }
+
+    .split-pane.left::after {
+      background: radial-gradient(circle, rgba(255, 114, 98, 0.55) 0%, rgba(255, 114, 98, 0) 70%);
+    }
+
+    .split-pane.right::after {
+      background: radial-gradient(circle, rgba(79, 167, 255, 0.55) 0%, rgba(79, 167, 255, 0) 70%);
+    }
+
+    .split-pane:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 28px 55px rgba(17, 32, 47, 0.2);
+    }
+
+    .pane-title {
+      font-family: "Fraunces", serif;
+      font-size: clamp(1.7rem, 3.5vw, 2.7rem);
+      line-height: 1.15;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pane-desc {
+      color: var(--muted);
+      max-width: 40ch;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pane-list {
+      list-style: none;
+      display: grid;
+      gap: 0.6rem;
+      font-size: 0.93rem;
+      color: #25384a;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pane-list li {
+      display: flex;
+      gap: 0.5rem;
+      align-items: baseline;
+    }
+
+    .pane-list li::before {
+      content: "*";
+      color: var(--rose);
+      font-weight: 800;
+    }
+
+    .right .pane-list li::before {
+      color: var(--sky);
+    }
+
+    .pane-btn {
+      margin-top: auto;
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      font-weight: 800;
+      color: #0e1f2f;
+      background: linear-gradient(135deg, #ffe6c7, #fff8ec);
+      border: 1px solid rgba(17, 32, 47, 0.22);
+      border-radius: 999px;
+      padding: 0.65rem 1.15rem;
+      transition: transform 0.25s ease, filter 0.25s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .right .pane-btn {
+      background: linear-gradient(135deg, #daf0ff, #eff8ff);
+    }
+
+    .pane-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(0.99);
+    }
+
+    footer {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto 1.2rem;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 1.3rem 1.2rem;
+      background: rgba(255, 255, 255, 0.8);
+      text-align: center;
+      box-shadow: 0 10px 26px rgba(17, 32, 47, 0.12);
+    }
+
+    .footer-course {
+      font-weight: 700;
+    }
+
+    .footer-author {
+      margin-top: 0.2rem;
+      color: #1f5f9f;
+      font-weight: 700;
+    }
+
+    .footer-institution {
+      margin-top: 0.6rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .footer-details {
+      margin-top: 0.8rem;
+      font-size: 0.86rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: center;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    @keyframes enter {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 870px) {
+      .split-container {
+        grid-template-columns: 1fr;
+      }
+
+      .navbar {
+        top: 0.65rem;
+      }
+
+      .intro-wrapper {
+        margin-top: 3rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-noise"></div>
+
+  <nav class="navbar">
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="rotoscope.html">Rotoscoping</a></li>
+      <li><a href="solarsystem.html">Solar System</a></li>
+    </ul>
+  </nav>
+
+  <header class="intro-wrapper">
+    <h1>Project Compilation for <span class="title-gradient">ITCI231</span></h1>
+    <p>Welcome to this portfolio website. It compiles outputs focused on two domains: precision-driven Rotoscoping VFX and the imaginative process of 3D world building for solar-system themed Blender work.</p>
+  </header>
+
+  <main class="split-container">
+    <section class="split-pane left">
+      <h2 class="pane-title">Rotoscoping</h2>
+      <p class="pane-desc">Explore frame-by-frame isolation, compositing tests, and kinetic typography decisions grounded in rhythm.</p>
+      <ul class="pane-list">
+        <li>Reference-driven scene planning</li>
+        <li>Masking workflow per shot</li>
+        <li>Ready slots for weekly submissions</li>
+      </ul>
+      <a href="rotoscope.html" class="pane-btn">Open Rotoscoping</a>
+    </section>
+
+    <section class="split-pane right">
+      <h2 class="pane-title">Solar System in Blender</h2>
+      <p class="pane-desc">Discover 3D studies for planets, atmospherics, camera animation, and render look-development in one stream.</p>
+      <ul class="pane-list">
+        <li>Model and material iterations</li>
+        <li>Lighting and composition passes</li>
+        <li>Expandable gallery and notes</li>
+      </ul>
+      <a href="solarsystem.html" class="pane-btn">Open Solar System</a>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-course">This landing page is for the course of "ITCI231: Multimedia and Authoring"</div>
+    <div class="footer-author">Made by Ericksson Brutas of BSIT-S-2A</div>
+    <div class="footer-institution">Technological University of the Philippines - Taguig (TUP-TAGUIG)</div>
+    <div class="footer-details">
+      <span>Academic Year 2025-2026</span>
+      <span>*</span>
+      <span>College of Engineering</span>
+      <span>*</span>
+      <span>Student Project Showcase</span>
+    </div>
+  </footer>
+</body>
+
+</html>

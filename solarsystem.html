@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solar System in Blender - ITCI231</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #12263d;
+      --muted: #5d7188;
+      --paper: #f6f8f3;
+      --panel: rgba(255, 255, 255, 0.78);
+      --line: rgba(18, 38, 61, 0.14);
+      --gold: #f2a93b;
+      --blue: #4389ff;
+      --teal: #27b39f;
+      --shadow: 0 18px 44px rgba(18, 38, 61, 0.16);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Manrope", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 6% 8%, rgba(242, 169, 59, 0.2), transparent 24%),
+        radial-gradient(circle at 95% 14%, rgba(67, 137, 255, 0.22), transparent 27%),
+        linear-gradient(140deg, #f6f8f3 0%, #eef8ff 53%, #ecfbf7 100%);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .texture {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image: radial-gradient(rgba(18, 38, 61, 0.06) 0.5px, transparent 0.5px);
+      background-size: 8px 8px;
+      opacity: 0.24;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 1rem;
+      z-index: 99;
+      width: min(1060px, calc(100% - 2rem));
+      margin: 1rem auto 0;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(9px);
+      box-shadow: 0 8px 24px rgba(18, 38, 61, 0.1);
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.55rem;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.45rem 1rem;
+      border-radius: 999px;
+      transition: background-color 0.25s ease, transform 0.25s ease;
+    }
+
+    .nav-links a:hover {
+      transform: translateY(-2px);
+      background: rgba(67, 137, 255, 0.14);
+    }
+
+    .content-area {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 2.3rem auto 2rem;
+      display: grid;
+      gap: 1.3rem;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: clamp(1.2rem, 3vw, 2.4rem);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      animation: enter 0.7s ease both;
+    }
+
+    .page-title {
+      font-family: "Fraunces", serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1.1;
+      margin-bottom: 0.65rem;
+    }
+
+    .page-title span {
+      color: transparent;
+      background: linear-gradient(105deg, var(--gold), var(--blue), var(--teal));
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .page-subtitle {
+      max-width: 72ch;
+      color: var(--muted);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      animation: enter 0.7s 0.15s ease both;
+    }
+
+    .feature-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 1rem;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .feature-card h3 {
+      font-family: "Fraunces", serif;
+      font-size: 1.2rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .feature-card p {
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    .progress-board {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: clamp(1.2rem, 3vw, 2rem);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      animation: enter 0.7s 0.3s ease both;
+    }
+
+    .progress-board h2 {
+      font-family: "Fraunces", serif;
+      margin-bottom: 0.6rem;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+    }
+
+    .progress-board p {
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.8rem;
+    }
+
+    .milestone {
+      border: 1px dashed rgba(18, 38, 61, 0.3);
+      border-radius: 14px;
+      padding: 0.85rem;
+      background: rgba(255, 255, 255, 0.85);
+      min-height: 130px;
+    }
+
+    .milestone strong {
+      display: block;
+      margin-bottom: 0.3rem;
+      color: #154d8c;
+      font-size: 0.9rem;
+      letter-spacing: 0.02em;
+    }
+
+    .milestone span {
+      color: var(--muted);
+      font-size: 0.84rem;
+      display: block;
+    }
+
+    footer {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto 1.2rem;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 1.3rem 1.2rem;
+      background: rgba(255, 255, 255, 0.8);
+      text-align: center;
+      box-shadow: 0 10px 26px rgba(18, 38, 61, 0.12);
+    }
+
+    .footer-course {
+      font-weight: 700;
+    }
+
+    .footer-author {
+      margin-top: 0.2rem;
+      color: #0f6d75;
+      font-weight: 700;
+    }
+
+    .footer-institution {
+      margin-top: 0.6rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .footer-details {
+      margin-top: 0.8rem;
+      font-size: 0.86rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: center;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    @keyframes enter {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 980px) {
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .timeline {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="texture"></div>
+
+  <nav class="navbar">
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="rotoscope.html">Rotoscoping</a></li>
+      <li><a href="solarsystem.html">Solar System</a></li>
+    </ul>
+  </nav>
+
+  <main class="content-area">
+    <section class="hero">
+      <h1 class="page-title"><span>Solar System Blender Projects</span></h1>
+      <p class="page-subtitle">This section is structured for 3D modeling, texturing, animation, and rendering outputs focused on solar-system scenes. Keep each phase documented so progress is easy to present and review.</p>
+    </section>
+
+    <section class="feature-grid">
+      <article class="feature-card">
+        <h3>Modeling</h3>
+        <p>Planet topology, ring geometry, scale balancing, and modular asset setup.</p>
+      </article>
+      <article class="feature-card">
+        <h3>Shading</h3>
+        <p>Surface detail, procedural textures, atmosphere layers, and glow passes.</p>
+      </article>
+      <article class="feature-card">
+        <h3>Animation</h3>
+        <p>Orbital motion, camera choreography, and timing sync for scene storytelling.</p>
+      </article>
+    </section>
+
+    <section class="progress-board">
+      <h2>Production Milestones</h2>
+      <p>Use these slots as your default sequence. Replace each note with links, stills, and final renders as tasks are submitted.</p>
+
+      <div class="timeline">
+        <article class="milestone">
+          <strong>Phase 1</strong>
+          <span>Scene setup, world scale, and initial asset blockout.</span>
+        </article>
+        <article class="milestone">
+          <strong>Phase 2</strong>
+          <span>Materials, atmospheric layers, and look-dev test renders.</span>
+        </article>
+        <article class="milestone">
+          <strong>Phase 3</strong>
+          <span>Motion design, camera spline work, and transition planning.</span>
+        </article>
+        <article class="milestone">
+          <strong>Phase 4</strong>
+          <span>Lighting polish, compositing, and final delivery exports.</span>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-course">This landing page is for the course of "ITCI231: Multimedia and Authoring"</div>
+    <div class="footer-author">Made by Ericksson Brutas of BSIT-S-2A</div>
+    <div class="footer-institution">Technological University of the Philippines - Taguig (TUP-TAGUIG)</div>
+    <div class="footer-details">
+      <span>Academic Year 2025-2026</span>
+      <span>*</span>
+      <span>College of Engineering</span>
+      <span>*</span>
+      <span>Student Project Showcase</span>
+    </div>
+  </footer>
+</body>
+
+</html>

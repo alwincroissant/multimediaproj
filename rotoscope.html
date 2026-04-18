@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rotoscoping - ITCI231</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #15263a;
+      --muted: #5f7285;
+      --paper: #faf6ee;
+      --panel: rgba(255, 255, 255, 0.78);
+      --line: rgba(21, 38, 58, 0.14);
+      --warm: #ff7a59;
+      --cool: #4d9fff;
+      --aqua: #2db6a5;
+      --shadow: 0 18px 44px rgba(21, 38, 58, 0.16);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Manrope", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 3% 8%, rgba(255, 122, 89, 0.19), transparent 26%),
+        radial-gradient(circle at 92% 12%, rgba(77, 159, 255, 0.2), transparent 30%),
+        linear-gradient(150deg, #faf6ee 0%, #f6fbff 56%, #eef9f3 100%);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .bg-texture {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image: radial-gradient(rgba(21, 38, 58, 0.06) 0.5px, transparent 0.5px);
+      background-size: 8px 8px;
+      opacity: 0.25;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 1rem;
+      z-index: 99;
+      width: min(1060px, calc(100% - 2rem));
+      margin: 1rem auto 0;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(9px);
+      box-shadow: 0 8px 24px rgba(21, 38, 58, 0.1);
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.55rem;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.45rem 1rem;
+      border-radius: 999px;
+      transition: background-color 0.25s ease, transform 0.25s ease;
+    }
+
+    .nav-links a:hover {
+      transform: translateY(-2px);
+      background: rgba(77, 159, 255, 0.14);
+    }
+
+    .content-area {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 2.3rem auto 2rem;
+      display: grid;
+      gap: 1.3rem;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: clamp(1.2rem, 3vw, 2.4rem);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      animation: enter 0.7s ease both;
+    }
+
+    .page-title {
+      font-family: "Fraunces", serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1.1;
+      margin-bottom: 0.65rem;
+    }
+
+    .page-title span {
+      color: transparent;
+      background: linear-gradient(100deg, var(--warm), var(--cool), var(--aqua));
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .page-subtitle {
+      max-width: 68ch;
+      color: var(--muted);
+    }
+
+    .video-section {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: clamp(1.2rem, 3vw, 2.1rem);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 1rem;
+      animation: enter 0.7s 0.15s ease both;
+    }
+
+    .video-header h2 {
+      font-family: "Fraunces", serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      margin-bottom: 0.25rem;
+    }
+
+    .video-credits {
+      color: #145c86;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(21, 38, 58, 0.22);
+      background: linear-gradient(140deg, #11263d, #182e48);
+    }
+
+    .video-wrapper iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .video-description {
+      border-left: 4px solid var(--warm);
+      padding-left: 1rem;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .weekly-board {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: clamp(1.2rem, 3vw, 2.1rem);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      animation: enter 0.7s 0.3s ease both;
+    }
+
+    .weekly-board h2 {
+      font-family: "Fraunces", serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      margin-bottom: 0.4rem;
+    }
+
+    .weekly-board p {
+      color: var(--muted);
+      margin-bottom: 1.2rem;
+    }
+
+    .week-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .week-card {
+      border: 1px solid rgba(21, 38, 58, 0.18);
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      flex-direction: column;
+      min-height: 235px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .week-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 14px 28px rgba(21, 38, 58, 0.16);
+    }
+
+    .week-head {
+      padding: 0.7rem 0.8rem;
+      font-weight: 800;
+      color: #114f86;
+      background: linear-gradient(90deg, rgba(77, 159, 255, 0.16), rgba(45, 182, 165, 0.13));
+      border-bottom: 1px solid rgba(21, 38, 58, 0.12);
+    }
+
+    .week-embed {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      border-bottom: 1px solid rgba(21, 38, 58, 0.12);
+      background: linear-gradient(145deg, #ecf4fb, #eaf8f3);
+    }
+
+    .week-embed iframe,
+    .week-embed .placeholder {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .placeholder {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: #4f6378;
+      font-size: 0.85rem;
+      padding: 0.75rem;
+      font-weight: 600;
+    }
+
+    .week-meta {
+      padding: 0.7rem 0.8rem 0.85rem;
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-top: auto;
+    }
+
+    footer {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto 1.2rem;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 1.3rem 1.2rem;
+      background: rgba(255, 255, 255, 0.8);
+      text-align: center;
+      box-shadow: 0 10px 26px rgba(21, 38, 58, 0.12);
+    }
+
+    .footer-course {
+      font-weight: 700;
+    }
+
+    .footer-author {
+      margin-top: 0.2rem;
+      color: #0f6d75;
+      font-weight: 700;
+    }
+
+    .footer-institution {
+      margin-top: 0.6rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .footer-details {
+      margin-top: 0.8rem;
+      font-size: 0.86rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: center;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    @keyframes enter {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 980px) {
+      .week-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .week-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .navbar {
+        top: 0.7rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-texture"></div>
+
+  <nav class="navbar">
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="rotoscope.html">Rotoscoping</a></li>
+      <li><a href="solarsystem.html">Solar System</a></li>
+    </ul>
+  </nav>
+
+  <main class="content-area">
+    <section class="hero">
+      <h1 class="page-title"><span>Rotoscoping Works</span></h1>
+      <p class="page-subtitle">A collection of projects showcasing visual effects compositing and frame-by-frame masking logic. Keep adding weekly outputs to build one complete process archive.</p>
+    </section>
+
+    <section class="video-section">
+      <div class="video-header">
+        <h2>Project Reference Video</h2>
+        <p class="video-credits">Dance Cover by Drelannotfamousyet | Song: 2hollis - Jeans</p>
+      </div>
+
+      <div class="video-wrapper">
+        <iframe src="https://www.youtube.com/embed/4CVPCU4LcEk" title="Reference video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+
+      <div class="video-description">
+        I chose this reference because it combines dynamic movement with a clean static camera angle. The pacing supports rhythmic VFX experiments and typography overlays while keeping motion readable.
+      </div>
+    </section>
+
+    <section class="weekly-board">
+      <h2>Weekly Submission Board (Week 1-12)</h2>
+      <p>Each week card is ready for a YouTube embed. To attach a video, set a valid video ID inside each card's data-video-id value in the HTML.</p>
+
+      <div class="week-grid" id="weekGrid">
+        <article class="week-card" data-video-id="" data-week="1">
+          <div class="week-head">Week 1</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Set data-video-id="YOUR_VIDEO_ID" to embed.</div>
+        </article>
+        <article class="week-card" data-video-id="" data-week="2">
+          <div class="week-head">Week 2</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Set data-video-id="YOUR_VIDEO_ID" to embed.</div>
+        </article>
+        <article class="week-card" data-video-id="" data-week="3">
+          <div class="week-head">Week 3</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Set data-video-id="YOUR_VIDEO_ID" to embed.</div>
+        </article>
+        <article class="week-card" data-video-id="" data-week="4">
+          <div class="week-head">Week 4</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Set data-video-id="YOUR_VIDEO_ID" to embed.</div>
+        </article>
+        <article class="week-card" data-video-id="" data-week="5">
+          <div class="week-head">Week 5</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Set data-video-id="YOUR_VIDEO_ID" to embed.</div>
+        </article>
+        <article class="week-card" data-video-id="" data-week="6">
+          <div class="week-head">Week 6</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Set data-video-id="YOUR_VIDEO_ID" to embed.</div>
+        </article>
+        <article class="week-card" data-video-id="" data-week="7">
+          <div class="week-head">Week 7</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Set data-video-id="YOUR_VIDEO_ID" to embed.</div>
+        </article>
+        <article class="week-card" data-video-id="" data-week="8">
+          <div class="week-head">Week 8</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Set data-video-id="YOUR_VIDEO_ID" to embed.</div>
+        </article>
+        <article class="week-card" data-video-id="" data-week="9">
+          <div class="week-head">Week 9</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Set data-video-id="YOUR_VIDEO_ID" to embed.</div>
+        </article>
+        <article class="week-card" data-video-id="" data-week="10">
+          <div class="week-head">Week 10</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Set data-video-id="YOUR_VIDEO_ID" to embed.</div>
+        </article>
+        <article class="week-card" data-video-id="" data-week="11">
+          <div class="week-head">Week 11</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Set data-video-id="YOUR_VIDEO_ID" to embed.</div>
+        </article>
+        <article class="week-card" data-video-id="" data-week="12">
+          <div class="week-head">Week 12</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Set data-video-id="YOUR_VIDEO_ID" to embed.</div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-course">This landing page is for the course of "ITCI231: Multimedia and Authoring"</div>
+    <div class="footer-author">Made by Ericksson Brutas of BSIT-S-2A</div>
+    <div class="footer-institution">Technological University of the Philippines - Taguig (TUP-TAGUIG)</div>
+    <div class="footer-details">
+      <span>Academic Year 2025-2026</span>
+      <span>*</span>
+      <span>College of Engineering</span>
+      <span>*</span>
+      <span>Student Project Showcase</span>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var cards = document.querySelectorAll('.week-card');
+      cards.forEach(function (card) {
+        var target = card.querySelector('.week-embed');
+        var videoId = (card.getAttribute('data-video-id') || '').trim();
+        var week = card.getAttribute('data-week');
+
+        if (videoId) {
+          var frame = document.createElement('iframe');
+          frame.src = 'https://www.youtube.com/embed/' + encodeURIComponent(videoId);
+          frame.title = 'Week ' + week + ' submission';
+          frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+          frame.allowFullscreen = true;
+          frame.style.border = '0';
+          target.appendChild(frame);
+        } else {
+          var placeholder = document.createElement('div');
+          placeholder.className = 'placeholder';
+          placeholder.textContent = 'Week ' + week + ': YouTube embed placeholder';
+          target.appendChild(placeholder);
+        }
+      });
+    })();
+  </script>
+</body>
+
+</html>
