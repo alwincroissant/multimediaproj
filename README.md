@@ -1,0 +1,3 @@
+# multimediaproj
+
+Initial repository setup.
