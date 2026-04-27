@@ -479,6 +479,37 @@
       flex-wrap: wrap;
     }
 
+    .flash-message {
+      position: fixed;
+      top: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(-120%);
+      background: linear-gradient(135deg, #c54242, #a83838);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      box-shadow: 0 12px 32px rgba(197, 66, 66, 0.25);
+      z-index: 1000;
+      animation: slideDown 0.4s ease both, slideOut 0.4s ease 3.6s both;
+      max-width: 90%;
+      text-align: center;
+    }
+
+    @keyframes slideDown {
+      to {
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    @keyframes slideOut {
+      to {
+        transform: translateX(-50%) translateY(-120%);
+        opacity: 0;
+      }
+    }
+
     @keyframes enter {
       from {
         opacity: 0;
@@ -527,6 +558,7 @@
 
 <body>
   <div class="texture"></div>
+  <div id="flash-message-container"></div>
 
   <nav class="navbar">
     <ul class="nav-links">
@@ -958,6 +990,39 @@
     });
 
     generateCelestialBodies();
+
+    // Flash message system
+    function showFlashMessage(message, type = 'error') {
+      const container = document.getElementById('flash-message-container');
+      if (!container) return;
+      
+      const div = document.createElement('div');
+      div.className = 'flash-message';
+      div.textContent = message;
+      container.appendChild(div);
+      
+      setTimeout(() => {
+        div.remove();
+      }, 4000);
+    }
+
+    // Check for flash messages in sessionStorage
+    window.addEventListener('DOMContentLoaded', () => {
+      const flashMsg = sessionStorage.getItem('flashMessage');
+      if (flashMsg) {
+        showFlashMessage(flashMsg);
+        sessionStorage.removeItem('flashMessage');
+      }
+    });
+
+    // URL validation
+    const validPages = ['index.html', 'rotoscope.html', 'solarsystem.html', ''];
+    const currentPage = window.location.pathname.split('/').pop();
+    
+    if (!validPages.includes(currentPage) && currentPage !== '') {
+      sessionStorage.setItem('flashMessage', '✗ Page not found. Redirecting to home...');
+      window.location.href = 'index.html';
+    }
   </script>
 </body>
 
