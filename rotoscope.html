@@ -467,6 +467,20 @@
           <div class="week-embed"></div>
           <div class="week-meta">Set data-video-id="YOUR_VIDEO_ID" to embed.</div>
         </article>
+        <article class="week-card" data-type="note">
+          <div class="week-head">Production Workflow</div>
+          <div class="week-embed">
+            <div class="placeholder">Tooling breakdown for the final output</div>
+          </div>
+          <div class="week-meta">I used FlipaClip for the first 20 seconds, and for the remaining 42 seconds I used Adobe After Effects.</div>
+        </article>
+        <article class="week-card" data-type="note">
+          <div class="week-head">Software Used</div>
+          <div class="week-embed">
+            <div class="placeholder">Rotoscoping software timeline</div>
+          </div>
+          <div class="week-meta">I used FlipaClip for the first 20 seconds, and for the remaining 42 seconds I used Adobe After Effects.</div>
+        </article>
       </div>
     </section>
   </main>
@@ -488,6 +502,10 @@
     (function () {
       var cards = document.querySelectorAll('.week-card');
       cards.forEach(function (card) {
+        if (card.getAttribute('data-type') === 'note') {
+          return;
+        }
+
         var target = card.querySelector('.week-embed');
         var videoId = (card.getAttribute('data-video-id') || '').trim();
         var week = card.getAttribute('data-week');
