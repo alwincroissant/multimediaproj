@@ -181,6 +181,7 @@
       color: #143e66;
     }
 
+    .workflow-board,
     .weekly-board {
       border: 1px solid var(--line);
       border-radius: 28px;
@@ -190,12 +191,14 @@
       animation: enter 0.7s 0.3s ease both;
     }
 
+    .workflow-board h2,
     .weekly-board h2 {
       font-family: "Fraunces", serif;
       font-size: clamp(1.4rem, 3vw, 2rem);
       margin-bottom: 0.4rem;
     }
 
+    .workflow-board p,
     .weekly-board p {
       color: var(--muted);
       margin-bottom: 1.2rem;
@@ -402,6 +405,28 @@
       </div>
     </section>
 
+    <section class="workflow-board">
+      <h2>Production Workflow and Software Used</h2>
+      <p>These cards summarize the software timeline used for the final rotoscoping output.</p>
+
+      <div class="week-grid">
+        <article class="week-card" data-type="note">
+          <div class="week-head">Production Workflow</div>
+          <div class="week-embed">
+            <div class="placeholder">Tooling breakdown for the final output</div>
+          </div>
+          <div class="week-meta">I used FlipaClip for the first 20 seconds, and for the remaining 42 seconds I used Adobe After Effects.</div>
+        </article>
+        <article class="week-card" data-type="note">
+          <div class="week-head">Software Used</div>
+          <div class="week-embed">
+            <div class="placeholder">Rotoscoping software timeline</div>
+          </div>
+          <div class="week-meta">I used FlipaClip for the first 20 seconds, and for the remaining 42 seconds I used Adobe After Effects.</div>
+        </article>
+      </div>
+    </section>
+
     <section class="weekly-board">
       <h2>Weekly Submission Board (Week 1-12)</h2>
 
@@ -465,20 +490,6 @@
           <div class="week-head">Week 12</div>
           <div class="week-embed"></div>
           <div class="week-meta">Set data-video-id="YOUR_VIDEO_ID" to embed.</div>
-        </article>
-        <article class="week-card" data-type="note">
-          <div class="week-head">Production Workflow</div>
-          <div class="week-embed">
-            <div class="placeholder">Tooling breakdown for the final output</div>
-          </div>
-          <div class="week-meta">I used FlipaClip for the first 20 seconds, and for the remaining 42 seconds I used Adobe After Effects.</div>
-        </article>
-        <article class="week-card" data-type="note">
-          <div class="week-head">Software Used</div>
-          <div class="week-embed">
-            <div class="placeholder">Rotoscoping software timeline</div>
-          </div>
-          <div class="week-meta">I used FlipaClip for the first 20 seconds, and for the remaining 42 seconds I used Adobe After Effects.</div>
         </article>
       </div>
     </section>
