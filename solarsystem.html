@@ -1168,6 +1168,14 @@
       }).join("");
     }
 
+    // Map display names to script filenames that actually exist in filespython/.
+    const scriptFileMap = {
+      Sun: 'sun.py',
+      Mercury: 'mercury.py',
+      Venus: 'venus.py',
+      Earth: 'earth.py'
+    };
+
     function generateCelestialBodies() {
       const container = document.getElementById('celestialBodies');
       container.innerHTML = '';
@@ -1215,15 +1223,16 @@
         fun.className = 'fun-facts';
         fun.innerHTML = '<h4>Fun Facts</h4><ul>' + body.funFacts.map(f => '<li>' + f + '</li>').join('') + '</ul>';
 
-        // Download link for Python script (disabled for Venus)
+        // Download link for Python script when a matching file exists.
         const downloadWrap = document.createElement('div');
         downloadWrap.className = 'planet-download';
-        if (body.name !== 'Venus') {
-          const pyName = 'filespython/' + body.name + '.py';
+        const scriptFile = scriptFileMap[body.name];
+        if (scriptFile) {
+          const pyName = 'filespython/' + scriptFile;
           const dl = document.createElement('a');
           dl.className = 'btn-link';
           dl.href = pyName;
-          dl.setAttribute('download', body.name + '.py');
+          dl.setAttribute('download', scriptFile);
           dl.textContent = 'Download ' + body.name + ' script';
           dl.target = '_blank';
           dl.rel = 'noopener noreferrer';
