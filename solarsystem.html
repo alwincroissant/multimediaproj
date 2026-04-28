@@ -367,12 +367,13 @@
     .planet-grid {
       display: grid;
       grid-template-columns: 1fr 1.15fr;
+      align-items: stretch;
     }
 
     .planet-video {
       position: relative;
-      min-height: 0;
-      aspect-ratio: 16 / 9;
+      min-height: 300px;
+      align-self: stretch;
       background: linear-gradient(140deg, #13283f, #1f3f63);
       display: grid;
       overflow: hidden;
@@ -609,7 +610,7 @@
       }
 
       .planet-video {
-        aspect-ratio: 16 / 9;
+        min-height: 220px;
       }
     }
 
