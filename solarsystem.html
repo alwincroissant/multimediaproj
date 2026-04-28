@@ -303,6 +303,50 @@
       margin-top: 0.8rem;
     }
 
+    .how-created {
+      margin-top: 1rem;
+      border: 1px solid rgba(18, 38, 61, 0.14);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.86);
+      padding: 1rem;
+    }
+
+    .how-created h4 {
+      margin: 0;
+      font-family: "Fraunces", serif;
+      font-size: 1.1rem;
+      color: #153a5b;
+    }
+
+    .how-created-intro {
+      margin-top: 0.4rem;
+      font-size: 0.92rem;
+      color: #4e637a;
+    }
+
+    .how-created ol {
+      margin: 0.75rem 0 0;
+      padding-left: 1.2rem;
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .how-created li {
+      color: #3f566d;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      padding: 0.15rem 0;
+    }
+
+    .how-created-note {
+      margin-top: 0.65rem;
+      padding-top: 0.6rem;
+      border-top: 1px dashed rgba(18, 38, 61, 0.2);
+      color: #2f4a63;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
     .planet-board {
       animation: enter 0.7s 0.3s ease both;
     }
@@ -647,11 +691,14 @@
         <p>Python scripting was used to automate orbital speed control, scene timing, and position accuracy so that each sequence stays consistent during rendering and compositing.</p>
         <div class="how-created" aria-hidden="false">
           <h4>How this was created</h4>
+          <p class="how-created-intro">Simple pipeline used for each celestial body project:</p>
           <ol>
-            <li>Run the Python file for a planet from the <a href="filespython/">filespython</a> folder to generate or export the scene geometry or animation.</li>
-            <li>Open the exported scene in Blender, then apply textures using the <strong>BlenderKit</strong> addon.</li>
-            <li>Render the sequence to MP4 (or export a GIF) and place resulting media into <code>gifconverted/</code> or project media folders.</li>
+            <li><strong>Download the planet script</strong> using the download button in the Celestial Bodies section.</li>
+            <li><strong>Run the Python script</strong> to generate the scene setup and animation behavior.</li>
+            <li><strong>Open in Blender 5.1</strong> and apply textures using the <strong>BlenderKit</strong> addon.</li>
+            <li><strong>Render output</strong> as MP4, then optionally convert/export to GIF for autoplay preview.</li>
           </ol>
+          <p class="how-created-note">Tools used: Blender 5.1, BlenderKit for textures, and Python for scripting.</p>
         </div>
       </div>
     </section>
@@ -907,6 +954,18 @@
     const planetAges = document.getElementById("planetAges");
     const calculateBtn = document.getElementById("calculateBtn");
 
+    // Explicit map of available GIF assets in gifconverted/
+    const gifAssetMap = {
+      sun: 'gifconverted/sungif.gif',
+      mercury: 'gifconverted/mercurygif.gif',
+      venus: 'gifconverted/venusgif.gif',
+      earth: 'gifconverted/earthgif.gif'
+    };
+
+    function getGifAssetPath(name) {
+      return gifAssetMap[String(name).toLowerCase()] || '';
+    }
+
     function setValidation(message) {
       validation.textContent = message;
       ageInput.setAttribute("aria-invalid", message ? "true" : "false");
@@ -964,19 +1023,19 @@
           const gif = document.createElement('img');
           gif.className = 'age-gif';
           gif.alt = planet.name + ' age GIF';
-          gif.src = 'gifconverted/' + planet.name + '.gif';
+          gif.src = getGifAssetPath(planet.name);
           const gifNote = document.createElement('div');
           gifNote.className = 'age-gif-note';
           gifNote.style.display = 'none';
           gifNote.textContent = 'No GIF available for ' + planet.name + '.';
 
-          let triedLower = false;
+          if (!gif.src) {
+            gif.remove();
+            gifNote.style.display = 'block';
+            gifWrap.appendChild(gifNote);
+            card.appendChild(gifWrap);
+          } else {
           gif.addEventListener('error', function () {
-            if (!triedLower) {
-              triedLower = true;
-              this.src = 'gifconverted/' + planet.name.toLowerCase() + '.gif';
-              return;
-            }
             this.remove();
             gifNote.style.display = 'block';
           });
@@ -984,6 +1043,7 @@
           gifWrap.appendChild(gif);
           gifWrap.appendChild(gifNote);
           card.appendChild(gifWrap);
+          }
         }
 
         const ageMain = document.createElement('p');
@@ -1044,21 +1104,33 @@
         return;
       }
 
-      // Try GIF variants first
-      const gifA = 'gifconverted/' + body.name + '.gif';
-      const gifB = 'gifconverted/' + body.name.toLowerCase() + '.gif';
+      // Try mapped GIF assets from gifconverted/ first
+      const gifPath = getGifAssetPath(body.name);
       const img = document.createElement('img');
       img.className = 'planet-gif';
       img.alt = body.name + ' preview GIF';
-      img.src = gifA;
+      img.src = gifPath;
 
-      let triedLower = false;
-      img.addEventListener('error', function () {
-        if (!triedLower) {
-          triedLower = true;
-          this.src = gifB;
+      if (!gifPath) {
+        if (body.videoUrl) {
+          const video = document.createElement('video');
+          video.controls = true;
+          video.loop = true;
+          video.muted = true;
+          video.playsInline = true;
+          video.preload = 'metadata';
+          const source = document.createElement('source');
+          source.src = body.videoUrl;
+          source.type = 'video/mp4';
+          video.appendChild(source);
+          mediaDiv.appendChild(video);
           return;
         }
+        mediaDiv.innerHTML = '<div class="video-fallback">No media added yet for ' + body.name + '.</div>';
+        return;
+      }
+
+      img.addEventListener('error', function () {
         // GIFs not available, try video
         if (body.videoUrl) {
           const video = document.createElement('video');
