@@ -64,5 +64,5 @@ bpy.context.preferences.edit.keyframe_new_interpolation_type = 'LINEAR'
 planet.rotation_euler = (0, 0, 0)
 planet.keyframe_insert(data_path="rotation_euler", frame=1)
 
-planet.rotation_euler = (0, 0, math.radians(360))
+planet.rotation_euler = (0, 0, math.radians(-360))
 planet.keyframe_insert(data_path="rotation_euler", frame=SPIN_FRAMES)

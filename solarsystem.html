@@ -312,6 +312,48 @@
       padding: 1rem;
     }
 
+    /* Grid to display the four step images for "How this was created" */
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.6rem;
+      margin-top: 0.85rem;
+    }
+
+    .how-step {
+      border: 1px solid rgba(18, 38, 61, 0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.95);
+      text-align: center;
+      padding: 0.35rem;
+    }
+
+    .how-step img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      display: block;
+      border-radius: 6px;
+      margin-bottom: 0.45rem;
+    }
+
+    .how-step figcaption {
+      font-size: 0.86rem;
+      color: #34506a;
+      font-weight: 700;
+      margin-top: 0.1rem;
+    }
+
+    @media (max-width: 900px) {
+      .how-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .how-grid { grid-template-columns: 1fr; }
+      .how-step img { height: 200px; }
+    }
+
     .how-created h4 {
       margin: 0;
       font-family: "Fraunces", serif;
@@ -695,11 +737,31 @@
           <h4>How this was created</h4>
           <p class="how-created-intro">Simple pipeline used for each celestial body project:</p>
           <ol>
-            <li><strong>Download the planet script</strong> using the download button in the Celestial Bodies section.</li>
-            <li><strong>Run the Python script</strong> to generate the scene setup and animation behavior.</li>
-            <li><strong>Open in Blender 5.1</strong> and apply textures using the <strong>BlenderKit</strong> addon.</li>
-            <li><strong>Render output</strong> as MP4, then optionally convert/export to GIF for autoplay preview.</li>
+            <li>Create a Python script that generates a spinning planet.</li>
+            <li>Open Blender and run the script first by going to the Scripting tab. (Make sure to delete everything in the scene first.)</li>
+            <li>Use BlenderKit (press N in the 3D Viewport and open the BlenderKit menu) to apply your own textures.</li>
+            <li>Render and enjoy.</li>
           </ol>
+
+          <div class="how-grid" aria-hidden="false">
+            <figure class="how-step">
+              <img src="blendersteps/step1.jpg" alt="Step 1 — Prepare Blender">
+              <figcaption>Step 1 — Download Scripts</figcaption>
+            </figure>
+            <figure class="how-step">
+              <img src="blendersteps/step2.jpg" alt="Step 2 — Run script">
+              <figcaption>Step 2 — Run Script</figcaption>
+            </figure>
+            <figure class="how-step">
+              <img src="blendersteps/step3.jpg" alt="Step 3 — Apply textures">
+              <figcaption>Step 3 — Apply Textures</figcaption>
+            </figure>
+            <figure class="how-step">
+              <img src="blendersteps/step4.jpg" alt="Step 4 — Render">
+              <figcaption>Step 4 — Render</figcaption>
+            </figure>
+          </div>
+
           <p class="how-created-note">Tools used: Blender 5.1, BlenderKit for textures, and Python for scripting.</p>
         </div>
       </div>
@@ -739,6 +801,7 @@
       { name: "Mercury", orbitalPeriodYears: 0.241, distanceFromSun: "57.9 million km" },
       { name: "Venus", orbitalPeriodYears: 0.615, distanceFromSun: "108.2 million km" },
       { name: "Earth", orbitalPeriodYears: 1.0, distanceFromSun: "149.6 million km" },
+      { name: "Moon", orbitalPeriodYears: 0.0748, distanceFromSun: "149.6 million km (shares Earth's orbit)" },
       { name: "Mars", orbitalPeriodYears: 1.881, distanceFromSun: "227.9 million km" },
       { name: "Jupiter", orbitalPeriodYears: 11.86, distanceFromSun: "778.5 million km" },
       { name: "Saturn", orbitalPeriodYears: 29.46, distanceFromSun: "1.43 billion km" },
@@ -827,6 +890,26 @@
         videoUrl: "SolarVideo/Earth.mp4",
         youtubeId: "",
         icon: "EA"
+      },
+      {
+        name: "Moon",
+        description: "The Moon is Earth's natural satellite and the brightest object in our night sky.",
+        diameter: "3,474 km",
+        distanceFromSun: "149.6 million km (Earth-centered orbit)",
+        orbitalPeriod: "27.3 days",
+        rotationPeriod: "27.3 days (tidally locked)",
+        moons: "0",
+        composition: "Rocky body with a metal-rich core and dusty regolith",
+        temperature: "-173C to 127C",
+        funFacts: [
+          "The Moon always shows the same face to Earth",
+          "It helps drive ocean tides through gravity",
+          "Apollo missions brought Moon rocks back to Earth",
+          "Its surface is covered in impact craters"
+        ],
+        videoUrl: "SolarVideo/Moon.mp4",
+        youtubeId: "",
+        icon: "MO"
       },
       {
         name: "Mars",
@@ -960,7 +1043,15 @@
     const gifAssetMap = {
       sun: 'gifconverted/sungif.gif',
       mercury: 'gifconverted/mercurygif.gif',
-      earth: 'gifconverted/earthgif.gif'
+      venus: 'gifconverted/venusgif.gif',
+      earth: 'gifconverted/earthgif.gif',
+      moon: 'gifconverted/moongif.gif',
+      mars: 'gifconverted/marsgif.gif',
+      jupiter: 'gifconverted/jupitergif.gif',
+      saturn: 'gifconverted/saturngif.gif',
+      uranus: 'gifconverted/uranus.gif',
+      neptune: 'gifconverted/neptune.gif',
+      pluto: 'gifconverted/plutogif.gif'
     };
 
     function getGifAssetPath(name) {
@@ -1018,24 +1109,22 @@
         title.textContent = planet.name;
         card.appendChild(title);
 
-        if (planet.name !== 'Venus') {
-          // GIF for age display (tries two filename cases, then hides and shows a note)
-          const gifWrap = document.createElement('div');
-          const gif = document.createElement('img');
-          gif.className = 'age-gif';
-          gif.alt = planet.name + ' age GIF';
-          gif.src = getGifAssetPath(planet.name);
-          const gifNote = document.createElement('div');
-          gifNote.className = 'age-gif-note';
-          gifNote.style.display = 'none';
-          gifNote.textContent = 'No GIF available for ' + planet.name + '.';
+        const gifWrap = document.createElement('div');
+        const gif = document.createElement('img');
+        gif.className = 'age-gif';
+        gif.alt = planet.name + ' age GIF';
+        gif.src = getGifAssetPath(planet.name);
+        const gifNote = document.createElement('div');
+        gifNote.className = 'age-gif-note';
+        gifNote.style.display = 'none';
+        gifNote.textContent = 'No GIF available for ' + planet.name + '.';
 
-          if (!gif.src) {
-            gif.remove();
-            gifNote.style.display = 'block';
-            gifWrap.appendChild(gifNote);
-            card.appendChild(gifWrap);
-          } else {
+        if (!gif.src) {
+          gif.remove();
+          gifNote.style.display = 'block';
+          gifWrap.appendChild(gifNote);
+          card.appendChild(gifWrap);
+        } else {
           gif.addEventListener('error', function () {
             this.remove();
             gifNote.style.display = 'block';
@@ -1044,7 +1133,6 @@
           gifWrap.appendChild(gif);
           gifWrap.appendChild(gifNote);
           card.appendChild(gifWrap);
-          }
         }
 
         const ageMain = document.createElement('p');
@@ -1071,41 +1159,9 @@
       ageResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    // Helper: attach media (GIF -> fallback to lowercase GIF -> MP4 -> placeholder)
+    // Helper: attach media from gifconverted/ or show a placeholder if missing.
     function attachMediaElement(mediaDiv, body) {
       mediaDiv.innerHTML = '';
-
-      if (body.youtubeId) {
-        const iframe = document.createElement('iframe');
-        iframe.src = 'https://www.youtube.com/embed/' + encodeURIComponent(body.youtubeId);
-        iframe.title = body.name + ' video';
-        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
-        iframe.loading = 'lazy';
-        mediaDiv.appendChild(iframe);
-        return;
-      }
-
-      // Venus: skip GIF lookup and use direct video/placeholder only
-      if (body.name === 'Venus') {
-        if (body.videoUrl) {
-          const video = document.createElement('video');
-          video.controls = true;
-          video.loop = true;
-          video.muted = true;
-          video.playsInline = true;
-          video.preload = 'metadata';
-          const source = document.createElement('source');
-          source.src = body.videoUrl;
-          source.type = 'video/mp4';
-          video.appendChild(source);
-          mediaDiv.appendChild(video);
-          return;
-        }
-        mediaDiv.innerHTML = '<div class="video-fallback">No media added yet for ' + body.name + '.</div>';
-        return;
-      }
-
-      // Try mapped GIF assets from gifconverted/ first
       const gifPath = getGifAssetPath(body.name);
       const img = document.createElement('img');
       img.className = 'planet-gif';
@@ -1113,42 +1169,11 @@
       img.src = gifPath;
 
       if (!gifPath) {
-        if (body.videoUrl) {
-          const video = document.createElement('video');
-          video.controls = true;
-          video.loop = true;
-          video.muted = true;
-          video.playsInline = true;
-          video.preload = 'metadata';
-          const source = document.createElement('source');
-          source.src = body.videoUrl;
-          source.type = 'video/mp4';
-          video.appendChild(source);
-          mediaDiv.appendChild(video);
-          return;
-        }
         mediaDiv.innerHTML = '<div class="video-fallback">No media added yet for ' + body.name + '.</div>';
         return;
       }
 
       img.addEventListener('error', function () {
-        // GIFs not available, try video
-        if (body.videoUrl) {
-          const video = document.createElement('video');
-          video.controls = true;
-          video.loop = true;
-          video.muted = true;
-          video.playsInline = true;
-          video.preload = 'metadata';
-          const source = document.createElement('source');
-          source.src = body.videoUrl;
-          source.type = 'video/mp4';
-          video.appendChild(source);
-          mediaDiv.innerHTML = '';
-          mediaDiv.appendChild(video);
-          return;
-        }
-        // final fallback
         mediaDiv.innerHTML = '<div class="video-fallback">No media added yet for ' + body.name + '.</div>';
       });
 
@@ -1173,7 +1198,14 @@
       Sun: 'sun.py',
       Mercury: 'mercury.py',
       Venus: 'venus.py',
-      Earth: 'earth.py'
+      Earth: 'earth.py',
+      Moon: 'moon.py',
+      Mars: 'mars.py',
+      Jupiter: 'jupiter.py',
+      Saturn: 'saturn.py',
+      Uranus: 'uranus.py',
+      Neptune: 'neptune.py',
+      Pluto: 'pluto.py'
     };
 
     function generateCelestialBodies() {
