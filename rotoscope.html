@@ -181,13 +181,199 @@
       color: #143e66;
     }
 
+    .tutorial-section {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: clamp(1.2rem, 3vw, 2.1rem);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      animation: enter 0.7s 0.25s ease both;
+    }
+
+    .tutorial-section:nth-of-type(5) {
+      animation-delay: 0.35s;
+    }
+
+    .tutorial-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .tutorial-logo {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .tutorial-header-text h2 {
+      font-family: "Fraunces", serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .tutorial-header-text p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 0.35rem;
+    }
+
+    .carousel-container {
+      display: grid;
+      gap: 1.2rem;
+      margin-top: 1rem;
+    }
+
+    .carousel-container.horizontal {
+      grid-template-columns: 1fr 1.2fr;
+      gap: 1rem;
+    }
+
+    .carousel-main {
+      position: relative;
+      border: 1px solid rgba(21, 38, 58, 0.12);
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .carousel-main.portrait {
+      height: 400px;
+    }
+
+    .carousel-image {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .carousel-main.portrait .carousel-image {
+      height: 100%;
+      object-fit: contain;
+      background: linear-gradient(135deg, #ecf4fb, #eaf8f3);
+    }
+
+    .carousel-image.ae-step {
+      object-fit: contain;
+      background: linear-gradient(135deg, #ecf4fb, #eaf8f3);
+    }
+
+    .carousel-controls {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 1rem;
+      pointer-events: none;
+    }
+
+    .carousel-btn {
+      pointer-events: auto;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(21, 38, 58, 0.2);
+      background: rgba(255, 255, 255, 0.9);
+      color: #143e66;
+      font-size: 1.4rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: background 0.25s ease, transform 0.25s ease;
+      box-shadow: 0 4px 12px rgba(21, 38, 58, 0.1);
+    }
+
+    .carousel-btn:hover {
+      background: rgba(77, 159, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    .carousel-info {
+      padding: 1.2rem;
+      background: linear-gradient(135deg, rgba(77, 159, 255, 0.08), rgba(45, 182, 165, 0.08));
+      border-top: 1px solid rgba(21, 38, 58, 0.08);
+      border-radius: 8px;
+    }
+
+    .carousel-step {
+      font-family: "Fraunces", serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #143e66;
+      margin-bottom: 0.5rem;
+    }
+
+    .carousel-description {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .carousel-indicators {
+      padding: 0 1.2rem 0.8rem;
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .carousel-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1px solid rgba(21, 38, 58, 0.2);
+      background: rgba(21, 38, 58, 0.1);
+      cursor: pointer;
+      transition: background 0.25s ease;
+    }
+
+    .carousel-dot.active {
+      background: #143e66;
+    }
+
+    .steps-grid {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .steps-grid-5col {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .steps-grid-4col {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .step-card {
+      border: 1px solid rgba(21, 38, 58, 0.14);
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.95);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .step-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(21, 38, 58, 0.12);
+    }
+
     .weekly-board {
       border: 1px solid var(--line);
       border-radius: 28px;
       padding: clamp(1.2rem, 3vw, 2.1rem);
       background: var(--panel);
       box-shadow: var(--shadow);
-      animation: enter 0.7s 0.3s ease both;
+      animation: enter 0.7s 0.4s ease both;
     }
 
     .weekly-board h2 {
@@ -196,13 +382,9 @@
       margin-bottom: 0.4rem;
     }
 
-    .weekly-board p {
+    .weekly-board > p {
       color: var(--muted);
       margin-bottom: 1.2rem;
-    }
-
-    .workflow-cards {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .week-grid {
@@ -266,6 +448,78 @@
       color: var(--muted);
       font-size: 0.82rem;
       margin-top: auto;
+    }
+
+
+    @media (max-width: 980px) {
+      .steps-grid-5col {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .steps-grid-4col {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .week-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .carousel-image {
+        height: 300px;
+      }
+
+      .carousel-container.horizontal {
+        grid-template-columns: 1fr;
+      }
+
+      .carousel-main.portrait {
+        height: 300px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .tutorial-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .week-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .navbar {
+        top: 0.7rem;
+      }
+
+      .carousel-image {
+        height: 250px;
+      }
+
+      .carousel-main.portrait {
+        height: 250px;
+      }
+
+      .carousel-container.horizontal {
+        grid-template-columns: 1fr;
+      }
+
+      .carousel-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 1.2rem;
+      }
+
+      .carousel-info {
+        padding: 1rem;
+      }
+
+      .carousel-step {
+        font-size: 1rem;
+      }
+
+      .carousel-description {
+        font-size: 0.9rem;
+      }
     }
 
     footer {
@@ -393,7 +647,7 @@
       </div>
 
       <div class="video-wrapper">
-        <iframe src="https://www.youtube.com/embed/deoewZPRfKo" title="Reference video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe src="https://www.youtube-nocookie.com/embed/deoewZPRfKo?modestbranding=1&rel=0&showinfo=0" title="Reference video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </div>
 
       <div class="video-description">
@@ -406,25 +660,77 @@
       </div>
     </section>
 
-    <div class="week-grid workflow-cards" aria-label="Production workflow cards">
-      <article class="week-card" data-type="note">
-        <div class="week-head">Production Workflow</div>
-        <div class="week-embed">
-          <div class="placeholder">Tooling breakdown for the final output</div>
+    <section class="tutorial-section">
+      <div class="tutorial-header">
+        <img src="logo/flipacliplogo.png" alt="FlipaClip logo" class="tutorial-logo">
+        <div class="tutorial-header-text">
+          <h2>Part 1: FlipaClip (Frame-by-Frame Rotoscoping)</h2>
+          <p>5 steps to create frame-by-frame rotoscope animation</p>
         </div>
-        <div class="week-meta">I used FlipaClip for the first 20 seconds, and for the remaining 42 seconds I used Adobe After Effects.</div>
-      </article>
-      <article class="week-card" data-type="note">
-        <div class="week-head">Software Used</div>
-        <div class="week-embed">
-          <div class="placeholder">Rotoscoping software timeline</div>
+      </div>
+      <div class="carousel-container horizontal">
+        <div class="carousel-main portrait">
+          <img id="flipaCarouselImage" src="stepsflipa/step1.jpg" alt="FlipaClip step" class="carousel-image">
+          <div class="carousel-controls">
+            <button class="carousel-btn" onclick="flipaCarousel(-1)">‹</button>
+            <button class="carousel-btn" onclick="flipaCarousel(1)">›</button>
+          </div>
         </div>
-        <div class="week-meta">I used FlipaClip for the first 20 seconds, and for the remaining 42 seconds I used Adobe After Effects.</div>
-      </article>
-    </div>
+        <div>
+          <div class="carousel-info">
+            <div class="carousel-step" id="flipaStepTitle">Step 1: Open FlipaClip and create a new project</div>
+            <div class="carousel-description" id="flipaStepDesc">Open FlipaClip and create a new project to get started with your rotoscoping animation.</div>
+          </div>
+          <div class="carousel-indicators">
+            <button class="carousel-dot active" onclick="flipaGoTo(0)"></button>
+            <button class="carousel-dot" onclick="flipaGoTo(1)"></button>
+            <button class="carousel-dot" onclick="flipaGoTo(2)"></button>
+            <button class="carousel-dot" onclick="flipaGoTo(3)"></button>
+            <button class="carousel-dot" onclick="flipaGoTo(4)"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tutorial-section">
+      <div class="tutorial-header">
+        <img src="logo/aelogo.png" alt="Adobe After Effects logo" class="tutorial-logo">
+        <div class="tutorial-header-text">
+          <h2>Part 2: After Effects (Roto Brush Method)</h2>
+          <p>11 steps to create professional rotoscope with Roto Brush</p>
+        </div>
+      </div>
+      <div class="carousel-container">
+        <div class="carousel-main">
+          <img id="aeCarouselImage" src="stepsae/step1.png" alt="After Effects step" class="carousel-image ae-step">
+          <div class="carousel-controls">
+            <button class="carousel-btn" onclick="aeCarousel(-1)">‹</button>
+            <button class="carousel-btn" onclick="aeCarousel(1)">›</button>
+          </div>
+        </div>
+        <div class="carousel-info">
+          <div class="carousel-step" id="aeStepTitle">Step 1: Open After Effects and import your video file</div>
+          <div class="carousel-description" id="aeStepDesc">Launch Adobe After Effects and import your video file to begin the rotoscoping process.</div>
+        </div>
+        <div class="carousel-indicators">
+          <button class="carousel-dot active" onclick="aeGoTo(0)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(1)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(2)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(3)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(4)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(5)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(6)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(7)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(8)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(9)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(10)"></button>
+        </div>
+      </div>
+    </section>
 
     <section class="weekly-board">
       <h2>Weekly Submission Board (Week 1-12)</h2>
+      <p>Progress documentation and weekly video submissions.</p>
 
       <div class="week-grid" id="weekGrid">
         <article class="week-card" data-video-id="8Uqme6DNd9A" data-week="1">
@@ -505,13 +811,79 @@
   </footer>
 
   <script>
+    // FlipaClip carousel data
+    const flipaSteps = [
+      { image: 'stepsflipa/step1.jpg', title: 'Step 1: Open FlipaClip and create a new project', desc: 'Open FlipaClip and create a new project to get started with your rotoscoping animation.' },
+      { image: 'stepsflipa/step2.jpg', title: 'Step 2: Adjust the project settings', desc: 'Adjust the project settings (resolution, FPS, canvas size) to your preferences.' },
+      { image: 'stepsflipa/step3.jpg', title: 'Step 3: Import your video', desc: 'Tap the top-right import/add button to bring in your video.' },
+      { image: 'stepsflipa/step4.jpg', title: 'Step 4: Animate frame by frame', desc: 'Once imported, animate over the live movement of your subject frame by frame.' },
+      { image: 'stepsflipa/step5.jpg', title: 'Step 5: Export your project', desc: 'When finished, make a movie and export your project.' }
+    ];
+
+    // After Effects carousel data
+    const aeSteps = [
+      { image: 'stepsae/step1.png', title: 'Step 1: Open After Effects and import your video file', desc: 'Launch Adobe After Effects and import your video file to begin the rotoscoping process.' },
+      { image: 'stepsae/step2.png', title: 'Step 2: Drag the video into the project/timeline', desc: 'Drag the video into the project/timeline to set up your composition.' },
+      { image: 'stepsae/step3.png', title: 'Step 3: Duplicate the MP4 layer', desc: 'Duplicate the MP4 layer (one copy stays as reference; the other is for rotobrushing).' },
+      { image: 'stepsae/step4.png', title: 'Step 4: Double-click the rotobrush layer to open it', desc: 'Double-click the rotobrush layer to open it in the Layer panel.' },
+      { image: 'stepsae/step5.png', title: 'Step 5: Select the Roto Brush Tool', desc: 'Select the Roto Brush Tool (object matte tool) and paint over your subject to create the initial selection.' },
+      { image: 'stepsae/step6.png', title: 'Step 6: Press Space/Play to propagate', desc: 'Press Space/Play to propagate the selection through the frames.' },
+      { image: 'stepsae/step7.png', title: 'Step 7: Refine the edges if messy', desc: 'If the edge gets messy, refine it: Hold Alt/Option and paint to subtract areas. Paint normally to add missing areas.' },
+      { image: 'stepsae/step8.png', title: 'Step 8: Click Freeze to finalize the roto', desc: 'When the selection is clean, click Freeze to finalize the roto.' },
+      { image: 'stepsae/step9.png', title: 'Step 9: Generate Fill for the rotobrushed layer', desc: 'Right-click the rotobrushed layer → Generate → Fill (or Color Fill).' },
+      { image: 'stepsae/step10.png', title: 'Step 10: Choose your desired color', desc: 'Choose your desired color for the fill.' },
+      { image: 'stepsae/step11.png', title: 'Step 11: Render the final rotoscoped video', desc: 'Render the final rotoscoped video to complete the effect.' }
+    ];
+
+    let flipaIndex = 0;
+    let aeIndex = 0;
+
+    function flipaCarousel(direction) {
+      flipaIndex = (flipaIndex + direction + flipaSteps.length) % flipaSteps.length;
+      updateFlipCarousel();
+    }
+
+    function flipaGoTo(index) {
+      flipaIndex = index;
+      updateFlipCarousel();
+    }
+
+    function updateFlipCarousel() {
+      const step = flipaSteps[flipaIndex];
+      document.getElementById('flipaCarouselImage').src = step.image;
+      document.getElementById('flipaStepTitle').textContent = step.title;
+      document.getElementById('flipaStepDesc').textContent = step.desc;
+      
+      document.querySelectorAll('.carousel-indicators')[0].querySelectorAll('.carousel-dot').forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === flipaIndex);
+      });
+    }
+
+    function aeCarousel(direction) {
+      aeIndex = (aeIndex + direction + aeSteps.length) % aeSteps.length;
+      updateAeCarousel();
+    }
+
+    function aeGoTo(index) {
+      aeIndex = index;
+      updateAeCarousel();
+    }
+
+    function updateAeCarousel() {
+      const step = aeSteps[aeIndex];
+      document.getElementById('aeCarouselImage').src = step.image;
+      document.getElementById('aeStepTitle').textContent = step.title;
+      document.getElementById('aeStepDesc').textContent = step.desc;
+      
+      document.querySelectorAll('.carousel-indicators')[1].querySelectorAll('.carousel-dot').forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === aeIndex);
+      });
+    }
+
+    // Week card embed generation
     (function () {
       var cards = document.querySelectorAll('.week-card');
       cards.forEach(function (card) {
-        if (card.getAttribute('data-type') === 'note') {
-          return;
-        }
-
         var target = card.querySelector('.week-embed');
         var videoId = (card.getAttribute('data-video-id') || '').trim();
         var week = card.getAttribute('data-week');
