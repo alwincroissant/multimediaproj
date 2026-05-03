@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solar System in Blender - ITCI231</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #12263d;
+      --muted: #5d7188;
+      --paper: #f6f8f3;
+      --panel: rgba(255, 255, 255, 0.78);
+      --line: rgba(18, 38, 61, 0.14);
+      --gold: #f2a93b;
+      --blue: #4389ff;
+      --teal: #27b39f;
+      --shadow: 0 18px 44px rgba(18, 38, 61, 0.16);
+      --danger: #c54242;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Manrope", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 6% 8%, rgba(242, 169, 59, 0.2), transparent 24%),
+        radial-gradient(circle at 95% 14%, rgba(67, 137, 255, 0.22), transparent 27%),
+        linear-gradient(140deg, #f6f8f3 0%, #eef8ff 53%, #ecfbf7 100%);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .texture {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image: radial-gradient(rgba(18, 38, 61, 0.06) 0.5px, transparent 0.5px);
+      background-size: 8px 8px;
+      opacity: 0.24;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 1rem;
+      z-index: 99;
+      width: min(1060px, calc(100% - 2rem));
+      margin: 1rem auto 0;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(9px);
+      box-shadow: 0 8px 24px rgba(18, 38, 61, 0.1);
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.55rem;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.45rem 1rem;
+      border-radius: 999px;
+      transition: background-color 0.25s ease, transform 0.25s ease;
+    }
+
+    .nav-links a:hover {
+      transform: translateY(-2px);
+      background: rgba(67, 137, 255, 0.14);
+    }
+
+    .content-area {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 2.3rem auto 2rem;
+      display: grid;
+      gap: 1.3rem;
+    }
+
+    .hero,
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: clamp(1.2rem, 3vw, 2.2rem);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      animation: enter 0.7s ease both;
+    }
+
+    .page-title {
+      font-family: "Fraunces", serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1.1;
+      margin-bottom: 0.65rem;
+    }
+
+    .page-title span,
+    .section-title span {
+      color: transparent;
+      background: linear-gradient(105deg, var(--gold), var(--blue), var(--teal));
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .page-subtitle {
+      max-width: 72ch;
+      color: var(--muted);
+    }
+
+    .section-title {
+      font-family: "Fraunces", serif;
+      font-size: clamp(1.4rem, 3vw, 2.1rem);
+      margin-bottom: 0.35rem;
+    }
+
+    .section-note {
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .calculator-panel {
+      animation: enter 0.7s 0.1s ease both;
+    }
+
+    .input-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .age-input {
+      flex: 1 1 220px;
+      border: 1px solid rgba(18, 38, 61, 0.25);
+      border-radius: 12px;
+      padding: 0.72rem 0.86rem;
+      font-family: inherit;
+      font-size: 0.98rem;
+      background: rgba(255, 255, 255, 0.94);
+      color: var(--ink);
+    }
+
+    .age-input:focus {
+      outline: 2px solid rgba(67, 137, 255, 0.24);
+      border-color: rgba(67, 137, 255, 0.45);
+    }
+
+    .age-input[aria-invalid="true"] {
+      border-color: rgba(197, 66, 66, 0.8);
+      outline: 2px solid rgba(197, 66, 66, 0.2);
+    }
+
+    .btn {
+      border: 1px solid rgba(18, 38, 61, 0.22);
+      border-radius: 999px;
+      padding: 0.72rem 1.1rem;
+      font-weight: 800;
+      font-family: inherit;
+      font-size: 0.94rem;
+      cursor: pointer;
+      color: #0f233a;
+      background: linear-gradient(130deg, #ffefcf, #f4fbff);
+      transition: transform 0.25s ease, filter 0.25s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(0.99);
+    }
+
+    .validation-msg {
+      min-height: 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--danger);
+      margin-bottom: 0.7rem;
+    }
+
+    .age-results {
+      display: none;
+      margin-top: 0.9rem;
+    }
+
+    .age-results.visible {
+      display: block;
+    }
+
+    .age-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.85rem;
+    }
+
+    .age-card {
+      border: 1px solid rgba(18, 38, 61, 0.16);
+      border-radius: 14px;
+      padding: 0.78rem;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .age-card h3 {
+      font-family: "Fraunces", serif;
+      font-size: 1.08rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .age-main {
+      color: #155fa5;
+      font-weight: 800;
+      margin-bottom: 0.35rem;
+    }
+
+    .age-card p {
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .age-gif {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .age-gif-note,
+    .gif-placeholder {
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-align: center;
+      padding: 0.45rem 0.25rem;
+    }
+
+    .planet-gif {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    .planet-download {
+      margin-top: 0.6rem;
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .overview-panel {
+      animation: enter 0.7s 0.2s ease both;
+    }
+
+    .overview-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .stat-card {
+      border: 1px solid rgba(18, 38, 61, 0.18);
+      border-radius: 14px;
+      padding: 0.85rem;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .stat-card h3 {
+      font-size: 0.92rem;
+      color: #145287;
+      margin-bottom: 0.2rem;
+    }
+
+    .stat-card p {
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: #183047;
+    }
+
+    .overview-copy {
+      color: var(--muted);
+    }
+
+    .overview-copy p + p {
+      margin-top: 0.8rem;
+    }
+
+    .how-created {
+      margin-top: 1rem;
+      border: 1px solid rgba(18, 38, 61, 0.14);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.86);
+      padding: 1rem;
+    }
+
+    /* Grid to display the four step images for "How this was created" */
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.6rem;
+      margin-top: 0.85rem;
+    }
+
+    .how-step {
+      border: 1px solid rgba(18, 38, 61, 0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.95);
+      text-align: center;
+      padding: 0.35rem;
+    }
+
+    .how-step img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      display: block;
+      border-radius: 6px;
+      margin-bottom: 0.45rem;
+    }
+
+    .how-step figcaption {
+      font-size: 0.86rem;
+      color: #34506a;
+      font-weight: 700;
+      margin-top: 0.1rem;
+    }
+
+    @media (max-width: 900px) {
+      .how-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .how-grid { grid-template-columns: 1fr; }
+      .how-step img { height: 200px; }
+    }
+
+    .how-created h4 {
+      margin: 0;
+      font-family: "Fraunces", serif;
+      font-size: 1.1rem;
+      color: #153a5b;
+    }
+
+    .how-created-intro {
+      margin-top: 0.4rem;
+      font-size: 0.92rem;
+      color: #4e637a;
+    }
+
+    .how-created ol {
+      margin: 0.75rem 0 0;
+      padding-left: 1.2rem;
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .how-created li {
+      color: #3f566d;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      padding: 0.15rem 0;
+    }
+
+    .how-created-note {
+      margin-top: 0.65rem;
+      padding-top: 0.6rem;
+      border-top: 1px dashed rgba(18, 38, 61, 0.2);
+      color: #2f4a63;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .planet-board {
+      animation: enter 0.7s 0.3s ease both;
+    }
+
+    .planet-list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .planet-item {
+      border: 1px solid rgba(18, 38, 61, 0.16);
+      border-radius: 18px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.86);
+    }
+
+    .planet-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      align-items: stretch;
+    }
+
+    .planet-video {
+      position: relative;
+      min-height: 300px;
+      align-self: stretch;
+      background: linear-gradient(140deg, #13283f, #1f3f63);
+      display: grid;
+      overflow: hidden;
+    }
+
+    .planet-video video,
+    .planet-video iframe {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border: 0;
+      display: block;
+    }
+
+    .video-fallback {
+      color: rgba(255, 255, 255, 0.88);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 0.8rem;
+    }
+
+    .planet-info {
+      padding: 1.1rem;
+    }
+
+    .planet-head {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.7rem;
+    }
+
+    .planet-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 1.15rem;
+      font-weight: 800;
+      border: 1px solid rgba(18, 38, 61, 0.18);
+      background: linear-gradient(145deg, rgba(67, 137, 255, 0.22), rgba(39, 179, 159, 0.22));
+      color: #143554;
+    }
+
+    .planet-name {
+      font-family: "Fraunces", serif;
+      font-size: 1.35rem;
+      line-height: 1.1;
+    }
+
+    .planet-desc {
+      color: var(--muted);
+      margin-bottom: 0.85rem;
+    }
+
+    .facts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.55rem;
+      margin-bottom: 0.7rem;
+    }
+
+    .fact-card {
+      border: 1px solid rgba(18, 38, 61, 0.14);
+      border-radius: 10px;
+      padding: 0.52rem;
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    .fact-card h4 {
+      font-size: 0.78rem;
+      color: #145287;
+      margin-bottom: 0.15rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .fact-card p,
+    .composition p {
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    .composition {
+      margin-bottom: 0.65rem;
+    }
+
+    .composition h4,
+    .fun-facts h4 {
+      font-size: 0.85rem;
+      color: #145287;
+      margin-bottom: 0.22rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .fun-facts ul {
+      margin-left: 1rem;
+      color: var(--muted);
+      font-size: 0.84rem;
+      display: grid;
+      gap: 0.2rem;
+    }
+
+    .download-panel {
+      animation: enter 0.7s 0.35s ease both;
+      text-align: center;
+    }
+
+    .download-panel p {
+      color: var(--muted);
+      max-width: 65ch;
+      margin: 0.45rem auto 1rem;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      justify-content: center;
+    }
+
+    .btn-link {
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(18, 38, 61, 0.22);
+      border-radius: 999px;
+      padding: 0.68rem 1.12rem;
+      font-weight: 800;
+      color: #0f233a;
+      background: linear-gradient(130deg, #daf0ff, #ecfff8);
+      transition: transform 0.25s ease, filter 0.25s ease;
+    }
+
+    .btn-link:hover {
+      transform: translateY(-2px);
+      filter: brightness(0.99);
+    }
+
+    footer {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto 1.2rem;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 1.3rem 1.2rem;
+      background: rgba(255, 255, 255, 0.8);
+      text-align: center;
+      box-shadow: 0 10px 26px rgba(18, 38, 61, 0.12);
+    }
+
+    .footer-course {
+      font-weight: 700;
+    }
+
+    .footer-author {
+      margin-top: 0.2rem;
+      color: #0f6d75;
+      font-weight: 700;
+    }
+
+    .footer-institution {
+      margin-top: 0.6rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .footer-details {
+      margin-top: 0.8rem;
+      font-size: 0.86rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: center;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .flash-message {
+      position: fixed;
+      top: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(-120%);
+      background: linear-gradient(135deg, #c54242, #a83838);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      box-shadow: 0 12px 32px rgba(197, 66, 66, 0.25);
+      z-index: 1000;
+      animation: slideDown 0.4s ease both, slideOut 0.4s ease 3.6s both;
+      max-width: 90%;
+      text-align: center;
+    }
+
+    @keyframes slideDown {
+      to {
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    @keyframes slideOut {
+      to {
+        transform: translateX(-50%) translateY(-120%);
+        opacity: 0;
+      }
+    }
+
+    @keyframes enter {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 980px) {
+      .age-grid,
+      .overview-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .planet-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .planet-video {
+        min-height: 220px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .age-grid,
+      .overview-stats,
+      .facts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .btn,
+      .btn-link {
+        width: 100%;
+      }
+
+      .input-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="texture"></div>
+  <div id="flash-message-container"></div>
+
+  <nav class="navbar">
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="rotoscope.html">Rotoscoping</a></li>
+      <li><a href="solarsystem.html">Solar System</a></li>
+    </ul>
+  </nav>
+
+  <main class="content-area">
+    <section class="hero">
+      <h1 class="page-title"><span>Solar System Blender Projects</span></h1>
+      <p class="page-subtitle">A complete project stream for 3D modeling, textures, animation, and rendered outputs. This page now includes planetary age conversion, full planet profiles, and downloadable project assets.</p>
+    </section>
+
+    <section class="panel video-panel" aria-label="Solar system video embed placeholder">
+      <h2 class="section-title"><span>Solar System Video</span></h2>
+      <p class="section-note">YouTube embed placeholder — empty for now. Add a video ID to enable playback.</p>
+      <div style="position:relative;padding-top:56.25%;border-radius:12px;overflow:hidden;border:1px solid rgba(18,38,61,0.08);background:#000;">
+        <iframe title="Solar System Video" src="" style="position:absolute;inset:0;width:100%;height:100%;border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" loading="lazy"></iframe>
+      </div>
+    </section>
+
+    <section class="panel calculator-panel">
+      <h2 class="section-title"><span>Planetary Age Calculator</span></h2>
+      <p class="section-note">Enter your age in Earth years to see your equivalent age across other planetary orbits.</p>
+      <div class="input-row">
+        <input id="ageInput" class="age-input" type="number" inputmode="decimal" min="0" max="150" step="0.1" placeholder="Enter your age in Earth years" aria-describedby="ageValidation">
+        <button id="calculateBtn" class="btn" type="button">Calculate Ages</button>
+      </div>
+      <div id="ageValidation" class="validation-msg" role="status" aria-live="polite"></div>
+      <div id="ageResults" class="age-results" aria-live="polite">
+        <div id="planetAges" class="age-grid"></div>
+      </div>
+    </section>
+
+    <section class="panel overview-panel">
+      <h2 class="section-title"><span>Project Overview</span></h2>
+      <div class="overview-stats">
+        <article class="stat-card">
+          <h3>Tools Used</h3>
+          <p>Blender 5.1, BlenderKit (textures), Python 3.11</p>
+        </article>
+        <article class="stat-card">
+          <h3>Render Time</h3>
+          <p>N/A</p>
+        </article>
+        <article class="stat-card">
+          <h3>Resolution</h3>
+          <p>1920 x 1080 (1080p)</p>
+        </article>
+      </div>
+      <div class="overview-copy">
+        <p>This animation blends visual storytelling and scientific timing. Each planetary body rotates and revolves with values based on real orbital references while preserving cinematic readability.</p>
+        <p>Python scripting was used to automate orbital speed control, scene timing, and position accuracy so that each sequence stays consistent during rendering and compositing.</p>
+        <div class="how-created" aria-hidden="false">
+          <h4>How this was created</h4>
+          <p class="how-created-intro">Simple pipeline used for each celestial body project:</p>
+          <ol>
+            <li>Create a Python script that generates a spinning planet.</li>
+            <li>Open Blender and run the script first by going to the Scripting tab. (Make sure to delete everything in the scene first.)</li>
+            <li>Use BlenderKit (press N in the 3D Viewport and open the BlenderKit menu) to apply your own textures.</li>
+            <li>Render and enjoy.</li>
+          </ol>
+
+          <div class="how-grid" aria-hidden="false">
+            <figure class="how-step">
+              <img src="blendersteps/step1.jpg" alt="Step 1 — Prepare Blender">
+              <figcaption>Step 1 — Download Scripts</figcaption>
+            </figure>
+            <figure class="how-step">
+              <img src="blendersteps/step2.jpg" alt="Step 2 — Run script">
+              <figcaption>Step 2 — Run Script</figcaption>
+            </figure>
+            <figure class="how-step">
+              <img src="blendersteps/step3.jpg" alt="Step 3 — Apply textures">
+              <figcaption>Step 3 — Apply Textures</figcaption>
+            </figure>
+            <figure class="how-step">
+              <img src="blendersteps/step4.jpg" alt="Step 4 — Render">
+              <figcaption>Step 4 — Render</figcaption>
+            </figure>
+          </div>
+
+          <p class="how-created-note">Tools used: Blender 5.1, BlenderKit for textures, and Python for scripting.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel planet-board">
+      <h2 class="section-title"><span>Celestial Bodies</span></h2>
+      <p class="section-note">Each profile contains a video slot, key facts, composition notes, and short study points.</p>
+      <div id="celestialBodies" class="planet-list"></div>
+    </section>
+
+    <section class="panel download-panel">
+      <h2 class="section-title"><span>Download Project Files</span></h2>
+      <p>Access the Blender project files and related materials directly from the shared drive link, or jump back to the rotoscoping portfolio stream.</p>
+      <div class="btn-row">
+        <a class="btn-link" href="https://drive.google.com/drive/folders/1Eq9G_Krttx3uCTkefcgT3JYXV9vlyQCO?usp=sharing" target="_blank" rel="noopener noreferrer">Download Blender Project</a>
+        <a class="btn-link" href="rotoscope.html">Open Rotoscoping Page</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-course">This landing page is for the course of "ITCI231: Multimedia and Authoring"</div>
+    <div class="footer-author">Made by Alwin C. Benitez of BSIT-S-2A</div>
+    <div class="footer-institution">Technological University of the Philippines - Taguig (TUP-TAGUIG)</div>
+    <div class="footer-details">
+      <span>Academic Year 2025-2026</span>
+      <span>*</span>
+      <span>College of Engineering</span>
+      <span>*</span>
+      <span>Student Project Showcase</span>
+    </div>
+  </footer>
+
+  <script>
+    const ageBodies = [
+      { name: "Mercury", orbitalPeriodYears: 0.241, distanceFromSun: "57.9 million km" },
+      { name: "Venus", orbitalPeriodYears: 0.615, distanceFromSun: "108.2 million km" },
+      { name: "Earth", orbitalPeriodYears: 1.0, distanceFromSun: "149.6 million km" },
+      { name: "Moon", orbitalPeriodYears: 0.0748, distanceFromSun: "149.6 million km (shares Earth's orbit)" },
+      { name: "Mars", orbitalPeriodYears: 1.881, distanceFromSun: "227.9 million km" },
+      { name: "Jupiter", orbitalPeriodYears: 11.86, distanceFromSun: "778.5 million km" },
+      { name: "Saturn", orbitalPeriodYears: 29.46, distanceFromSun: "1.43 billion km" },
+      { name: "Uranus", orbitalPeriodYears: 84.01, distanceFromSun: "2.87 billion km" },
+      { name: "Neptune", orbitalPeriodYears: 164.8, distanceFromSun: "4.5 billion km" },
+      { name: "Pluto", orbitalPeriodYears: 248.0, distanceFromSun: "5.9 billion km" }
+    ];
+
+    const celestialBodies = [
+      {
+        name: "Sun",
+        description: "The Sun is the star at the center of our solar system, providing light and heat to all planets.",
+        diameter: "1,392,700 km",
+        distanceFromSun: "0 km (center)",
+        orbitalPeriod: "N/A",
+        rotationPeriod: "25-35 days",
+        moons: "0",
+        composition: "73% Hydrogen, 25% Helium, 2% Other",
+        temperature: "5,778 K (surface), 15 million K (core)",
+        funFacts: [
+          "The Sun contains 99.86% of the Solar System's mass",
+          "It is classified as a G-type main-sequence star",
+          "The Sun's core temperature is about 15 million K",
+          "It converts roughly 600 million tons of hydrogen every second"
+        ],
+        videoUrl: "SolarVideo/Sun.mp4",
+        youtubeId: "",
+        icon: "SO"
+      },
+      {
+        name: "Mercury",
+        description: "Mercury is the smallest planet and closest to the Sun, with extreme temperature variations.",
+        diameter: "4,879 km",
+        distanceFromSun: "57.9 million km",
+        orbitalPeriod: "88 Earth days",
+        rotationPeriod: "59 Earth days",
+        moons: "0",
+        composition: "Large iron core, thin silicate mantle",
+        temperature: "-173C to 427C",
+        funFacts: [
+          "Mercury has no atmosphere to retain heat",
+          "A day on Mercury lasts longer than its year",
+          "It has the most eccentric orbit among major planets",
+          "Mercury is shrinking as its core cools"
+        ],
+        videoUrl: "SolarVideo/Mercury.mp4",
+        youtubeId: "",
+        icon: "ME"
+      },
+      {
+        name: "Venus",
+        description: "Venus is the hottest planet in our solar system due to its thick, high-pressure atmosphere.",
+        diameter: "12,104 km",
+        distanceFromSun: "108.2 million km",
+        orbitalPeriod: "225 Earth days",
+        rotationPeriod: "243 Earth days (retrograde)",
+        moons: "0",
+        composition: "Rocky with dense atmosphere of carbon dioxide",
+        temperature: "462C",
+        funFacts: [
+          "Venus rotates backwards compared to most planets",
+          "Its atmosphere is mostly carbon dioxide",
+          "Surface pressure is around 92 times Earth",
+          "Venus is often called Earth's evil twin"
+        ],
+        videoUrl: "SolarVideo/Venus.mp4",
+        youtubeId: "",
+        icon: "VE"
+      },
+      {
+        name: "Earth",
+        description: "Earth is the only known planet to harbor life, with liquid water and a protective atmosphere.",
+        diameter: "12,756 km",
+        distanceFromSun: "149.6 million km",
+        orbitalPeriod: "365.25 days",
+        rotationPeriod: "24 hours",
+        moons: "1 (The Moon)",
+        composition: "Rocky with 71% water coverage",
+        temperature: "-89C to 58C",
+        funFacts: [
+          "Earth is the only planet not named after a Roman or Greek god",
+          "It has a strong magnetic field shielding solar radiation",
+          "Its atmosphere enables stable liquid water",
+          "Earth is estimated to be about 4.54 billion years old"
+        ],
+        videoUrl: "SolarVideo/Earth.mp4",
+        youtubeId: "",
+        icon: "EA"
+      },
+      {
+        name: "Moon",
+        description: "The Moon is Earth's natural satellite and the brightest object in our night sky.",
+        diameter: "3,474 km",
+        distanceFromSun: "149.6 million km (Earth-centered orbit)",
+        orbitalPeriod: "27.3 days",
+        rotationPeriod: "27.3 days (tidally locked)",
+        moons: "0",
+        composition: "Rocky body with a metal-rich core and dusty regolith",
+        temperature: "-173C to 127C",
+        funFacts: [
+          "The Moon always shows the same face to Earth",
+          "It helps drive ocean tides through gravity",
+          "Apollo missions brought Moon rocks back to Earth",
+          "Its surface is covered in impact craters"
+        ],
+        videoUrl: "SolarVideo/Moon.mp4",
+        youtubeId: "",
+        icon: "MO"
+      },
+      {
+        name: "Mars",
+        description: "Mars, the red planet, has the largest volcano and canyon in the solar system.",
+        diameter: "6,792 km",
+        distanceFromSun: "227.9 million km",
+        orbitalPeriod: "687 Earth days",
+        rotationPeriod: "24.6 hours",
+        moons: "2 (Phobos, Deimos)",
+        composition: "Rocky with iron oxide-rich surface",
+        temperature: "-87C to -5C",
+        funFacts: [
+          "Olympus Mons is the largest volcano in the solar system",
+          "Mars has seasons due to axial tilt",
+          "It has polar caps of water ice and frozen carbon dioxide",
+          "Evidence suggests ancient liquid water once flowed on Mars"
+        ],
+        videoUrl: "SolarVideo/Mars.mp4",
+        youtubeId: "",
+        icon: "MA"
+      },
+      {
+        name: "Jupiter",
+        description: "Jupiter is the largest planet, a gas giant with a massive long-lasting storm.",
+        diameter: "142,984 km",
+        distanceFromSun: "778.5 million km",
+        orbitalPeriod: "12 Earth years",
+        rotationPeriod: "9.9 hours",
+        moons: "95+",
+        composition: "Mostly hydrogen and helium",
+        temperature: "-108C (cloud tops)",
+        funFacts: [
+          "The Great Red Spot is larger than Earth",
+          "Jupiter helps deflect many incoming objects",
+          "It has a faint ring system",
+          "Its mass exceeds that of all other planets combined"
+        ],
+        videoUrl: "SolarVideo/Jupiter.mp4",
+        youtubeId: "",
+        icon: "JU"
+      },
+      {
+        name: "Saturn",
+        description: "Saturn is known for its extensive ring system and low overall density.",
+        diameter: "120,536 km",
+        distanceFromSun: "1.43 billion km",
+        orbitalPeriod: "29 Earth years",
+        rotationPeriod: "10.7 hours",
+        moons: "146+",
+        composition: "Mostly hydrogen and helium",
+        temperature: "-139C (cloud tops)",
+        funFacts: [
+          "Saturn's rings are mostly ice particles",
+          "It is less dense than water",
+          "Titan has lakes of liquid methane",
+          "A hexagonal storm persists at its north pole"
+        ],
+        videoUrl: "SolarVideo/Saturn.mp4",
+        youtubeId: "",
+        icon: "SA"
+      },
+      {
+        name: "Uranus",
+        description: "Uranus is an ice giant that rotates on its side with a dramatic axial tilt.",
+        diameter: "51,118 km",
+        distanceFromSun: "2.87 billion km",
+        orbitalPeriod: "84 Earth years",
+        rotationPeriod: "17.2 hours (retrograde)",
+        moons: "27+",
+        composition: "Water, methane, and ammonia ices",
+        temperature: "-197C",
+        funFacts: [
+          "Uranus is tilted by about 98 degrees",
+          "It was the first planet discovered using a telescope",
+          "Its methane-rich atmosphere gives it a blue-green color",
+          "Uranus has a faint ring system"
+        ],
+        videoUrl: "SolarVideo/Uranus.mp4",
+        youtubeId: "",
+        icon: "UR"
+      },
+      {
+        name: "Neptune",
+        description: "Neptune is the windiest major planet with fast-moving storms and deep blue color.",
+        diameter: "49,528 km",
+        distanceFromSun: "4.5 billion km",
+        orbitalPeriod: "165 Earth years",
+        rotationPeriod: "16.1 hours",
+        moons: "16+",
+        composition: "Water, methane, and ammonia ices",
+        temperature: "-201C",
+        funFacts: [
+          "Neptune has the fastest winds in the solar system",
+          "It was discovered through mathematical prediction",
+          "Its moon Triton orbits in a retrograde direction",
+          "Neptune emits more energy than it receives from the Sun"
+        ],
+        videoUrl: "SolarVideo/Neptune.mp4",
+        youtubeId: "",
+        icon: "NE"
+      },
+      {
+        name: "Pluto",
+        description: "Pluto is a dwarf planet with a highly elliptical orbit and an icy surface.",
+        diameter: "2,376 km",
+        distanceFromSun: "5.9 billion km",
+        orbitalPeriod: "248 Earth years",
+        rotationPeriod: "6.4 Earth days",
+        moons: "5",
+        composition: "Rock and ice",
+        temperature: "-229C",
+        funFacts: [
+          "Pluto was reclassified as a dwarf planet in 2006",
+          "Its heart-shaped region is called Tombaugh Regio",
+          "Charon is proportionally very large compared to Pluto",
+          "One Pluto year lasts 248 Earth years"
+        ],
+        videoUrl: "SolarVideo/Pluto.mp4",
+        youtubeId: "",
+        icon: "PL"
+      }
+    ];
+
+    const ageInput = document.getElementById("ageInput");
+    const validation = document.getElementById("ageValidation");
+    const ageResults = document.getElementById("ageResults");
+    const planetAges = document.getElementById("planetAges");
+    const calculateBtn = document.getElementById("calculateBtn");
+
+    // Explicit map of available GIF assets in gifconverted/
+    const gifAssetMap = {
+      sun: 'gifconverted/sungif.gif',
+      mercury: 'gifconverted/mercurygif.gif',
+      venus: 'gifconverted/venusgif.gif',
+      earth: 'gifconverted/earthgif.gif',
+      moon: 'gifconverted/moongif.gif',
+      mars: 'gifconverted/marsgif.gif',
+      jupiter: 'gifconverted/jupitergif.gif',
+      saturn: 'gifconverted/saturngif.gif',
+      uranus: 'gifconverted/uranus.gif',
+      neptune: 'gifconverted/neptune.gif',
+      pluto: 'gifconverted/plutogif.gif'
+    };
+
+    function getGifAssetPath(name) {
+      return gifAssetMap[String(name).toLowerCase()] || '';
+    }
+
+    function setValidation(message) {
+      validation.textContent = message;
+      ageInput.setAttribute("aria-invalid", message ? "true" : "false");
+    }
+
+    function parseValidAge() {
+      const raw = ageInput.value.trim();
+      if (!raw) {
+        setValidation("Please enter your age in Earth years.");
+        return null;
+      }
+
+      const value = Number(raw);
+      if (!Number.isFinite(value)) {
+        setValidation("Age must be a valid number.");
+        return null;
+      }
+
+      if (value <= 0) {
+        setValidation("Age must be greater than 0.");
+        return null;
+      }
+
+      if (value > 122) {
+        setValidation("Please enter an age less than or equal to 122. (Unless you are on the world record holder for human longevity!)");
+        return null;
+      }
+
+      setValidation("");
+      return value;
+    }
+
+    function calculateAges() {
+      const earthAge = parseValidAge();
+      if (earthAge === null) {
+        ageResults.classList.remove("visible");
+        return;
+      }
+
+      planetAges.innerHTML = "";
+      ageBodies.forEach((planet) => {
+        const planetAge = (earthAge / planet.orbitalPeriodYears).toFixed(2);
+        const revolutions = Math.floor(earthAge / planet.orbitalPeriodYears);
+
+        const card = document.createElement("article");
+        card.className = "age-card";
+
+        const title = document.createElement('h3');
+        title.textContent = planet.name;
+        card.appendChild(title);
+
+        const gifWrap = document.createElement('div');
+        const gif = document.createElement('img');
+        gif.className = 'age-gif';
+        gif.alt = planet.name + ' age GIF';
+        gif.src = getGifAssetPath(planet.name);
+        const gifNote = document.createElement('div');
+        gifNote.className = 'age-gif-note';
+        gifNote.style.display = 'none';
+        gifNote.textContent = 'No GIF available for ' + planet.name + '.';
+
+        if (!gif.src) {
+          gif.remove();
+          gifNote.style.display = 'block';
+          gifWrap.appendChild(gifNote);
+          card.appendChild(gifWrap);
+        } else {
+          gif.addEventListener('error', function () {
+            this.remove();
+            gifNote.style.display = 'block';
+          });
+
+          gifWrap.appendChild(gif);
+          gifWrap.appendChild(gifNote);
+          card.appendChild(gifWrap);
+        }
+
+        const ageMain = document.createElement('p');
+        ageMain.className = 'age-main';
+        ageMain.textContent = 'Age: ' + planetAge + ' years';
+        card.appendChild(ageMain);
+
+        const rev = document.createElement('p');
+        rev.innerHTML = '<strong>Revolutions:</strong> ' + revolutions;
+        card.appendChild(rev);
+
+        const orbit = document.createElement('p');
+        orbit.innerHTML = '<strong>Orbit Time:</strong> ' + planet.orbitalPeriodYears + ' Earth years';
+        card.appendChild(orbit);
+
+        const dist = document.createElement('p');
+        dist.innerHTML = '<strong>Distance:</strong> ' + planet.distanceFromSun;
+        card.appendChild(dist);
+
+        planetAges.appendChild(card);
+      });
+
+      ageResults.classList.add('visible');
+      ageResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Helper: attach media from gifconverted/ or show a placeholder if missing.
+    function attachMediaElement(mediaDiv, body) {
+      mediaDiv.innerHTML = '';
+      const gifPath = getGifAssetPath(body.name);
+      const img = document.createElement('img');
+      img.className = 'planet-gif';
+      img.alt = body.name + ' preview GIF';
+      img.src = gifPath;
+
+      if (!gifPath) {
+        mediaDiv.innerHTML = '<div class="video-fallback">No media added yet for ' + body.name + '.</div>';
+        return;
+      }
+
+      img.addEventListener('error', function () {
+        mediaDiv.innerHTML = '<div class="video-fallback">No media added yet for ' + body.name + '.</div>';
+      });
+
+      mediaDiv.appendChild(img);
+    }
+
+    function createFacts(body) {
+      return [
+        { label: "Diameter", value: body.diameter },
+        { label: "Distance from Sun", value: body.distanceFromSun },
+        { label: "Orbital Period", value: body.orbitalPeriod },
+        { label: "Rotation Period", value: body.rotationPeriod },
+        { label: "Moons", value: body.moons },
+        { label: "Temperature", value: body.temperature }
+      ].map(function (item) {
+        return "<article class=\"fact-card\"><h4>" + item.label + "</h4><p>" + item.value + "</p></article>";
+      }).join("");
+    }
+
+    // Map display names to script filenames that actually exist in filespython/.
+    const scriptFileMap = {
+      Sun: 'sun.py',
+      Mercury: 'mercury.py',
+      Venus: 'venus.py',
+      Earth: 'earth.py',
+      Moon: 'moon.py',
+      Mars: 'mars.py',
+      Jupiter: 'jupiter.py',
+      Saturn: 'saturn.py',
+      Uranus: 'uranus.py',
+      Neptune: 'neptune.py',
+      Pluto: 'pluto.py'
+    };
+
+    function generateCelestialBodies() {
+      const container = document.getElementById('celestialBodies');
+      container.innerHTML = '';
+
+      celestialBodies.forEach(function (body, index) {
+        const item = document.createElement('article');
+        item.className = 'planet-item';
+
+        const grid = document.createElement('div');
+        grid.className = 'planet-grid';
+
+        // Media column
+        const mediaCol = document.createElement('div');
+        mediaCol.className = 'planet-video';
+        attachMediaElement(mediaCol, body);
+
+        // Info column
+        const info = document.createElement('div');
+        info.className = 'planet-info';
+
+        const head = document.createElement('div');
+        head.className = 'planet-head';
+        const icon = document.createElement('div');
+        icon.className = 'planet-icon';
+        icon.textContent = body.icon;
+        const name = document.createElement('h3');
+        name.className = 'planet-name';
+        name.textContent = body.name;
+        head.appendChild(icon);
+        head.appendChild(name);
+
+        const desc = document.createElement('p');
+        desc.className = 'planet-desc';
+        desc.textContent = body.description;
+
+        const factsGrid = document.createElement('div');
+        factsGrid.className = 'facts-grid';
+        factsGrid.innerHTML = createFacts(body);
+
+        const comp = document.createElement('div');
+        comp.className = 'composition';
+        comp.innerHTML = '<h4>Composition</h4><p>' + body.composition + '</p>';
+
+        const fun = document.createElement('div');
+        fun.className = 'fun-facts';
+        fun.innerHTML = '<h4>Fun Facts</h4><ul>' + body.funFacts.map(f => '<li>' + f + '</li>').join('') + '</ul>';
+
+        // Download link for Python script when a matching file exists.
+        const downloadWrap = document.createElement('div');
+        downloadWrap.className = 'planet-download';
+        const scriptFile = scriptFileMap[body.name];
+        if (scriptFile) {
+          const pyName = 'filespython/' + scriptFile;
+          const dl = document.createElement('a');
+          dl.className = 'btn-link';
+          dl.href = pyName;
+          dl.setAttribute('download', scriptFile);
+          dl.textContent = 'Download ' + body.name + ' script';
+          dl.target = '_blank';
+          dl.rel = 'noopener noreferrer';
+          downloadWrap.appendChild(dl);
+        }
+
+        info.appendChild(head);
+        info.appendChild(desc);
+        info.appendChild(factsGrid);
+        info.appendChild(comp);
+        info.appendChild(fun);
+        info.appendChild(downloadWrap);
+
+        const reverse = index % 2 === 1;
+        if (reverse) {
+          grid.appendChild(info);
+          grid.appendChild(mediaCol);
+        } else {
+          grid.appendChild(mediaCol);
+          grid.appendChild(info);
+        }
+
+        item.appendChild(grid);
+        container.appendChild(item);
+      });
+    }
+
+    calculateBtn.addEventListener("click", calculateAges);
+    ageInput.addEventListener("input", function () {
+      if (validation.textContent) {
+        parseValidAge();
+      }
+    });
+    ageInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        calculateAges();
+      }
+    });
+
+    generateCelestialBodies();
+
+    // Flash message system
+    function showFlashMessage(message, type = 'error') {
+      const container = document.getElementById('flash-message-container');
+      if (!container) return;
+      
+      const div = document.createElement('div');
+      div.className = 'flash-message';
+      div.textContent = message;
+      container.appendChild(div);
+      
+      setTimeout(() => {
+        div.remove();
+      }, 4000);
+    }
+
+    // Check for flash messages in sessionStorage
+    window.addEventListener('DOMContentLoaded', () => {
+      const flashMsg = sessionStorage.getItem('flashMessage');
+      if (flashMsg) {
+        showFlashMessage(flashMsg);
+        sessionStorage.removeItem('flashMessage');
+      }
+    });
+
+    // URL validation
+    const validPages = ['index.html', 'rotoscope.html', 'solarsystem.html', ''];
+    const currentPage = window.location.pathname.split('/').pop();
+    
+    if (!validPages.includes(currentPage) && currentPage !== '') {
+      sessionStorage.setItem('flashMessage', '✗ Page not found. Redirecting to home...');
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+
+</html>
