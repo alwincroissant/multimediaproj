@@ -286,7 +286,7 @@ create_orbit_line(D_MOON, "Moon", earth_orbit, location=(D_EARTH, 0, 0))
 
 objs_before = set(bpy.context.scene.objects)
 try:
-    bpy.ops.mesh.primitive_uv_sphere_add(radius=R_MOON, location=(D_EARTH + D_MOON, 0, 0))
+    bpy.ops.mesh.primitive_uv_sphere_add(radius=R_MOON, location=(D_MOON, 0, 0))
     new_objs = set(bpy.context.scene.objects) - objs_before
     if new_objs:
         moon_body = list(new_objs)[0]
@@ -296,7 +296,6 @@ except Exception:
     mesh = bpy.data.meshes.new("Moon")
     moon_body = bpy.data.objects.new("Moon", mesh)
     bpy.context.scene.collection.objects.link(moon_body)
-    moon_body.location = (D_EARTH + D_MOON, 0, 0)
     import bmesh
     bm = bmesh.new()
     bmesh.ops.create_uvsphere(bm, u_segments=32, v_segments=16, radius=R_MOON)
@@ -306,6 +305,7 @@ except Exception:
 moon_body.name = "Moon"
 smooth_object(moon_body)
 moon_body.parent = moon_orbit
+moon_body.location = (D_MOON, 0, 0)
 apply_material(moon_body, "moon")
 
 moon_orbit.rotation_euler = (0, 0, 0)
