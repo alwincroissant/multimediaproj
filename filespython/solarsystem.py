@@ -421,6 +421,6 @@ fill_data.energy = 1.0
 fill_data.size = 100
 fill_light = bpy.data.objects.new("FillLight", fill_data)
 bpy.context.scene.collection.objects.link(fill_light)
-fill_light.location = (0, 0, 50)
+fill_light.location = (0, 0, 50)  
 
-print("✅ Solar System Generation Complete (Robust Blender 5.1+ Compatible)!")
+print("✅ Solar System Generation Complete (Robust Blender 5.1+ Compatible)!") 
