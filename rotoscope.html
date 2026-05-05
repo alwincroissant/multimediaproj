@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rotoscoping - ITCI231</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #15263a;
+      --muted: #5f7285;
+      --paper: #faf6ee;
+      --panel: rgba(255, 255, 255, 0.78);
+      --line: rgba(21, 38, 58, 0.14);
+      --warm: #ff7a59;
+      --cool: #4d9fff;
+      --aqua: #2db6a5;
+      --shadow: 0 18px 44px rgba(21, 38, 58, 0.16);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Manrope", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 3% 8%, rgba(255, 122, 89, 0.19), transparent 26%),
+        radial-gradient(circle at 92% 12%, rgba(77, 159, 255, 0.2), transparent 30%),
+        linear-gradient(150deg, #faf6ee 0%, #f6fbff 56%, #eef9f3 100%);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .bg-texture {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image: radial-gradient(rgba(21, 38, 58, 0.06) 0.5px, transparent 0.5px);
+      background-size: 8px 8px;
+      opacity: 0.25;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 1rem;
+      z-index: 99;
+      width: min(1060px, calc(100% - 2rem));
+      margin: 1rem auto 0;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(9px);
+      box-shadow: 0 8px 24px rgba(21, 38, 58, 0.1);
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.55rem;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.45rem 1rem;
+      border-radius: 999px;
+      transition: background-color 0.25s ease, transform 0.25s ease;
+    }
+
+    .nav-links a:hover {
+      transform: translateY(-2px);
+      background: rgba(77, 159, 255, 0.14);
+    }
+
+    .content-area {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 2.3rem auto 2rem;
+      display: grid;
+      gap: 1.3rem;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: clamp(1.2rem, 3vw, 2.4rem);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      animation: enter 0.7s ease both;
+    }
+
+    .page-title {
+      font-family: "Fraunces", serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1.1;
+      margin-bottom: 0.65rem;
+    }
+
+    .page-title span {
+      color: transparent;
+      background: linear-gradient(100deg, var(--warm), var(--cool), var(--aqua));
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .page-subtitle {
+      max-width: 68ch;
+      color: var(--muted);
+    }
+
+    .video-section {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: clamp(1.2rem, 3vw, 2.1rem);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 1rem;
+      animation: enter 0.7s 0.15s ease both;
+    }
+
+    .video-header h2 {
+      font-family: "Fraunces", serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      margin-bottom: 0.25rem;
+    }
+
+    .video-credits {
+      color: #145c86;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(21, 38, 58, 0.22);
+      background: linear-gradient(140deg, #11263d, #182e48);
+    }
+
+    .video-wrapper iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .video-description {
+      border-left: 4px solid var(--warm);
+      padding-left: 1rem;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .video-disclaimer {
+      border: 1px solid rgba(21, 38, 58, 0.18);
+      border-radius: 12px;
+      padding: 0.9rem 1rem;
+      background: rgba(255, 255, 255, 0.82);
+      color: #395169;
+      font-size: 0.9rem;
+    }
+
+    .video-disclaimer strong {
+      color: #143e66;
+    }
+
+    .tutorial-section {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: clamp(1.2rem, 3vw, 2.1rem);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      animation: enter 0.7s 0.25s ease both;
+    }
+
+    .tutorial-section:nth-of-type(5) {
+      animation-delay: 0.35s;
+    }
+
+    .tutorial-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .tutorial-logo {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .tutorial-header-text h2 {
+      font-family: "Fraunces", serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .tutorial-header-text p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 0.35rem;
+    }
+
+    .carousel-container {
+      display: grid;
+      gap: 1.2rem;
+      margin-top: 1rem;
+    }
+
+    .carousel-container.horizontal {
+      grid-template-columns: 1fr 1.2fr;
+      gap: 1rem;
+    }
+
+    .carousel-main {
+      position: relative;
+      border: 1px solid rgba(21, 38, 58, 0.12);
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .carousel-main.portrait {
+      height: 400px;
+    }
+
+    .carousel-image {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .carousel-main.portrait .carousel-image {
+      height: 100%;
+      object-fit: contain;
+      background: linear-gradient(135deg, #ecf4fb, #eaf8f3);
+    }
+
+    .carousel-image.ae-step {
+      object-fit: contain;
+      background: linear-gradient(135deg, #ecf4fb, #eaf8f3);
+    }
+
+    .carousel-controls {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 1rem;
+      pointer-events: none;
+    }
+
+    .carousel-btn {
+      pointer-events: auto;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(21, 38, 58, 0.2);
+      background: rgba(255, 255, 255, 0.9);
+      color: #143e66;
+      font-size: 1.4rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: background 0.25s ease, transform 0.25s ease;
+      box-shadow: 0 4px 12px rgba(21, 38, 58, 0.1);
+    }
+
+    .carousel-btn:hover {
+      background: rgba(77, 159, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    .carousel-info {
+      padding: 1.2rem;
+      background: linear-gradient(135deg, rgba(77, 159, 255, 0.08), rgba(45, 182, 165, 0.08));
+      border-top: 1px solid rgba(21, 38, 58, 0.08);
+      border-radius: 8px;
+    }
+
+    .carousel-step {
+      font-family: "Fraunces", serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #143e66;
+      margin-bottom: 0.5rem;
+    }
+
+    .carousel-description {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .carousel-indicators {
+      padding: 0 1.2rem 0.8rem;
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .carousel-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1px solid rgba(21, 38, 58, 0.2);
+      background: rgba(21, 38, 58, 0.1);
+      cursor: pointer;
+      transition: background 0.25s ease;
+    }
+
+    .carousel-dot.active {
+      background: #143e66;
+    }
+
+    .steps-grid {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .steps-grid-5col {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .steps-grid-4col {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .step-card {
+      border: 1px solid rgba(21, 38, 58, 0.14);
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.95);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .step-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(21, 38, 58, 0.12);
+    }
+
+    .weekly-board {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: clamp(1.2rem, 3vw, 2.1rem);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      animation: enter 0.7s 0.4s ease both;
+    }
+
+    .weekly-board h2 {
+      font-family: "Fraunces", serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      margin-bottom: 0.4rem;
+    }
+
+    .weekly-board > p {
+      color: var(--muted);
+      margin-bottom: 1.2rem;
+    }
+
+    .week-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .week-card {
+      border: 1px solid rgba(21, 38, 58, 0.18);
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      flex-direction: column;
+      min-height: 235px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .week-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 14px 28px rgba(21, 38, 58, 0.16);
+    }
+
+    .week-head {
+      padding: 0.7rem 0.8rem;
+      font-weight: 800;
+      color: #114f86;
+      background: linear-gradient(90deg, rgba(77, 159, 255, 0.16), rgba(45, 182, 165, 0.13));
+      border-bottom: 1px solid rgba(21, 38, 58, 0.12);
+    }
+
+    .week-embed {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      border-bottom: 1px solid rgba(21, 38, 58, 0.12);
+      background: linear-gradient(145deg, #ecf4fb, #eaf8f3);
+    }
+
+    .week-embed iframe,
+    .week-embed .placeholder {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .placeholder {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: #4f6378;
+      font-size: 0.85rem;
+      padding: 0.75rem;
+      font-weight: 600;
+    }
+
+    .week-meta {
+      padding: 0.7rem 0.8rem 0.85rem;
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-top: auto;
+    }
+
+
+    @media (max-width: 980px) {
+      .steps-grid-5col {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .steps-grid-4col {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .week-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .carousel-image {
+        height: 300px;
+      }
+
+      .carousel-container.horizontal {
+        grid-template-columns: 1fr;
+      }
+
+      .carousel-main.portrait {
+        height: 300px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .tutorial-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .week-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .navbar {
+        top: 0.7rem;
+      }
+
+      .carousel-image {
+        height: 250px;
+      }
+
+      .carousel-main.portrait {
+        height: 250px;
+      }
+
+      .carousel-container.horizontal {
+        grid-template-columns: 1fr;
+      }
+
+      .carousel-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 1.2rem;
+      }
+
+      .carousel-info {
+        padding: 1rem;
+      }
+
+      .carousel-step {
+        font-size: 1rem;
+      }
+
+      .carousel-description {
+        font-size: 0.9rem;
+      }
+    }
+
+    footer {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto 1.2rem;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 1.3rem 1.2rem;
+      background: rgba(255, 255, 255, 0.8);
+      text-align: center;
+      box-shadow: 0 10px 26px rgba(21, 38, 58, 0.12);
+    }
+
+    .footer-course {
+      font-weight: 700;
+    }
+
+    .footer-author {
+      margin-top: 0.2rem;
+      color: #0f6d75;
+      font-weight: 700;
+    }
+
+    .footer-institution {
+      margin-top: 0.6rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .footer-details {
+      margin-top: 0.8rem;
+      font-size: 0.86rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: center;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .flash-message {
+      position: fixed;
+      top: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(-120%);
+      background: linear-gradient(135deg, #c54242, #a83838);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      box-shadow: 0 12px 32px rgba(197, 66, 66, 0.25);
+      z-index: 1000;
+      animation: slideDown 0.4s ease both, slideOut 0.4s ease 3.6s both;
+      max-width: 90%;
+      text-align: center;
+    }
+
+    @keyframes slideDown {
+      to {
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    @keyframes slideOut {
+      to {
+        transform: translateX(-50%) translateY(-120%);
+        opacity: 0;
+      }
+    }
+
+    @keyframes enter {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 980px) {
+      .week-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .week-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .navbar {
+        top: 0.7rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-texture"></div>
+  <div id="flash-message-container"></div>
+
+  <nav class="navbar">
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="rotoscope.html">Rotoscoping</a></li>
+      <li><a href="solarsystem.html">Solar System</a></li>
+    </ul>
+  </nav>
+
+  <main class="content-area">
+    <section class="hero">
+      <h1 class="page-title"><span>Rotoscoping Works</span></h1>
+      <p class="page-subtitle">A collection of projects showcasing visual effects compositing and frame-by-frame masking logic. Keep adding weekly outputs to build one complete process archive.</p>
+    </section>
+
+    <section class="video-section">
+      <div class="video-header">
+        <h2>Project Reference Video</h2>
+        <p class="video-credits">Gangsta - Kehlani / Jane Kim Choreography | LOKI DANCE COVER | AETERNA</p>
+      </div>
+
+      <div class="video-wrapper">
+        <iframe src="https://www.youtube-nocookie.com/embed/deoewZPRfKo?modestbranding=1&rel=0&showinfo=0" title="Reference video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+
+      <div class="video-description">
+        This reference is used for educational study and movement analysis in rotoscope practice, including timing, masking direction, and compositing flow.
+      </div>
+
+      <div class="video-disclaimer">
+        <strong>Disclaimer and Credits:</strong> All rights to the original video belong to the rightful owner and uploader. Reference source: "Gangsta - Kehlani / Jane Kim Choreography | LOKI DANCE COVER" by AETERNA.
+        This page does not claim ownership of the original footage, audio, or choreography.
+      </div>
+    </section>
+
+    <section class="tutorial-section">
+      <div class="tutorial-header">
+        <img src="logo/flipacliplogo.png" alt="FlipaClip logo" class="tutorial-logo">
+        <div class="tutorial-header-text">
+          <h2>Part 1: FlipaClip (Frame-by-Frame Rotoscoping)</h2>
+          <p>5 steps to create frame-by-frame rotoscope animation</p>
+        </div>
+      </div>
+      <div class="carousel-container horizontal">
+        <div class="carousel-main portrait">
+          <img id="flipaCarouselImage" src="stepsflipa/step1.jpg" alt="FlipaClip step" class="carousel-image">
+          <div class="carousel-controls">
+            <button class="carousel-btn" onclick="flipaCarousel(-1)">‹</button>
+            <button class="carousel-btn" onclick="flipaCarousel(1)">›</button>
+          </div>
+        </div>
+        <div>
+          <div class="carousel-info">
+            <div class="carousel-step" id="flipaStepTitle">Step 1: Open FlipaClip and create a new project</div>
+            <div class="carousel-description" id="flipaStepDesc">Open FlipaClip and create a new project to get started with your rotoscoping animation.</div>
+          </div>
+          <div class="carousel-indicators">
+            <button class="carousel-dot active" onclick="flipaGoTo(0)"></button>
+            <button class="carousel-dot" onclick="flipaGoTo(1)"></button>
+            <button class="carousel-dot" onclick="flipaGoTo(2)"></button>
+            <button class="carousel-dot" onclick="flipaGoTo(3)"></button>
+            <button class="carousel-dot" onclick="flipaGoTo(4)"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tutorial-section">
+      <div class="tutorial-header">
+        <img src="logo/aelogo.png" alt="Adobe After Effects logo" class="tutorial-logo">
+        <div class="tutorial-header-text">
+          <h2>Part 2: After Effects (Roto Brush Method)</h2>
+          <p>11 steps to create professional rotoscope with Roto Brush</p>
+        </div>
+      </div>
+      <div class="carousel-container">
+        <div class="carousel-main">
+          <img id="aeCarouselImage" src="stepsae/step1.png" alt="After Effects step" class="carousel-image ae-step">
+          <div class="carousel-controls">
+            <button class="carousel-btn" onclick="aeCarousel(-1)">‹</button>
+            <button class="carousel-btn" onclick="aeCarousel(1)">›</button>
+          </div>
+        </div>
+        <div class="carousel-info">
+          <div class="carousel-step" id="aeStepTitle">Step 1: Open After Effects and import your video file</div>
+          <div class="carousel-description" id="aeStepDesc">Launch Adobe After Effects and import your video file to begin the rotoscoping process.</div>
+        </div>
+        <div class="carousel-indicators">
+          <button class="carousel-dot active" onclick="aeGoTo(0)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(1)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(2)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(3)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(4)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(5)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(6)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(7)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(8)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(9)"></button>
+          <button class="carousel-dot" onclick="aeGoTo(10)"></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="weekly-board">
+      <h2>Weekly Submission Board (Week 1-12)</h2>
+      <p>Progress documentation and weekly video submissions.</p>
+
+      <div class="week-grid" id="weekGrid">
+        <article class="week-card" data-video-id="8Uqme6DNd9A" data-week="1">
+          <div class="week-head">Week 1</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Week 1 roto progress</div>
+        </article>
+        <article class="week-card" data-video-id="dbi8Vh7SCXo" data-week="2">
+          <div class="week-head">Week 2</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Week 2</div>
+        </article>
+        <article class="week-card" data-video-id="V1dHKe6EW78" data-week="3">
+          <div class="week-head">Week 3</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Week 3</div>
+        </article>
+        <article class="week-card" data-video-id="LLsPkWk0HLA" data-week="4">
+          <div class="week-head">Week 4</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Week 4: Continued masking refinement and edge cleanup</div>
+        </article>
+        <article class="week-card" data-video-id="OMu3zeNtQsc" data-week="5">
+          <div class="week-head">Week 5</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Week 5: Refining timing and movement flow</div>
+        </article>
+        <article class="week-card" data-video-id="oWexB0Xp9d8" data-week="6">
+          <div class="week-head">Week 6</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Week 6: Adding depth and multi-layer compositing</div>
+        </article>
+        <article class="week-card" data-video-id="PBSH35hqr3w" data-week="7">
+          <div class="week-head">Week 7</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Week 7: Compositing adjustments and frame-by-frame refinement</div>
+        </article>
+        <article class="week-card" data-video-id="0GEzXYlw6UI" data-week="8">
+          <div class="week-head">Week 8</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Week 8: Color correction and visual effects application</div>
+        </article>
+        <article class="week-card" data-video-id="bxIvW24GWC0" data-week="9">
+          <div class="week-head">Week 9</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Week 9: Blending modes and transition effects</div>
+        </article>
+        <article class="week-card" data-video-id="ZNPiDuPdeUI" data-week="10">
+          <div class="week-head">Week 10</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Week 10: Final refinements and quality assurance</div>
+        </article>
+        <article class="week-card" data-video-id="uL2R65Ny-jY" data-week="11">
+          <div class="week-head">Week 11</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Week 11: Polish and final adjustments</div>
+        </article>
+        <article class="week-card" data-video-id="iTtYUOEcceY" data-week="12">
+          <div class="week-head">Week 12</div>
+          <div class="week-embed"></div>
+          <div class="week-meta">Week 12: Final submission and project completion</div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-course">This landing page is for the course of "ITCI231: Multimedia and Authoring"</div>
+    <div class="footer-author">Made by Alwin C. Benitez of BSIT-S-2A</div>
+    <div class="footer-institution">Technological University of the Philippines - Taguig (TUP-TAGUIG)</div>
+    <div class="footer-details">
+      <span>Academic Year 2025-2026</span>
+      <span>*</span>
+      <span>College of Engineering</span>
+      <span>*</span>
+      <span>Student Project Showcase</span>
+    </div>
+  </footer>
+
+  <script>
+    // FlipaClip carousel data
+    const flipaSteps = [
+      { image: 'stepsflipa/step1.jpg', title: 'Step 1: Open FlipaClip and create a new project', desc: 'Open FlipaClip and create a new project to get started with your rotoscoping animation.' },
+      { image: 'stepsflipa/step2.jpg', title: 'Step 2: Adjust the project settings', desc: 'Adjust the project settings (resolution, FPS, canvas size) to your preferences.' },
+      { image: 'stepsflipa/step3.jpg', title: 'Step 3: Import your video', desc: 'Tap the top-right import/add button to bring in your video.' },
+      { image: 'stepsflipa/step4.jpg', title: 'Step 4: Animate frame by frame', desc: 'Once imported, animate over the live movement of your subject frame by frame.' },
+      { image: 'stepsflipa/step5.jpg', title: 'Step 5: Export your project', desc: 'When finished, make a movie and export your project.' }
+    ];
+
+    // After Effects carousel data
+    const aeSteps = [
+      { image: 'stepsae/step1.png', title: 'Step 1: Open After Effects and import your video file', desc: 'Launch Adobe After Effects and import your video file to begin the rotoscoping process.' },
+      { image: 'stepsae/step2.png', title: 'Step 2: Drag the video into the project/timeline', desc: 'Drag the video into the project/timeline to set up your composition.' },
+      { image: 'stepsae/step3.png', title: 'Step 3: Duplicate the MP4 layer', desc: 'Duplicate the MP4 layer (one copy stays as reference; the other is for rotobrushing).' },
+      { image: 'stepsae/step4.png', title: 'Step 4: Double-click the rotobrush layer to open it', desc: 'Double-click the rotobrush layer to open it in the Layer panel.' },
+      { image: 'stepsae/step5.png', title: 'Step 5: Select the Roto Brush Tool', desc: 'Select the Roto Brush Tool (object matte tool) and paint over your subject to create the initial selection.' },
+      { image: 'stepsae/step6.png', title: 'Step 6: Press Space/Play to propagate', desc: 'Press Space/Play to propagate the selection through the frames.' },
+      { image: 'stepsae/step7.png', title: 'Step 7: Refine the edges if messy', desc: 'If the edge gets messy, refine it: Hold Alt/Option and paint to subtract areas. Paint normally to add missing areas.' },
+      { image: 'stepsae/step8.png', title: 'Step 8: Click Freeze to finalize the roto', desc: 'When the selection is clean, click Freeze to finalize the roto.' },
+      { image: 'stepsae/step9.png', title: 'Step 9: Generate Fill for the rotobrushed layer', desc: 'Right-click the rotobrushed layer → Generate → Fill (or Color Fill).' },
+      { image: 'stepsae/step10.png', title: 'Step 10: Choose your desired color', desc: 'Choose your desired color for the fill.' },
+      { image: 'stepsae/step11.png', title: 'Step 11: Render the final rotoscoped video', desc: 'Render the final rotoscoped video to complete the effect.' }
+    ];
+
+    let flipaIndex = 0;
+    let aeIndex = 0;
+
+    function flipaCarousel(direction) {
+      flipaIndex = (flipaIndex + direction + flipaSteps.length) % flipaSteps.length;
+      updateFlipCarousel();
+    }
+
+    function flipaGoTo(index) {
+      flipaIndex = index;
+      updateFlipCarousel();
+    }
+
+    function updateFlipCarousel() {
+      const step = flipaSteps[flipaIndex];
+      document.getElementById('flipaCarouselImage').src = step.image;
+      document.getElementById('flipaStepTitle').textContent = step.title;
+      document.getElementById('flipaStepDesc').textContent = step.desc;
+      
+      document.querySelectorAll('.carousel-indicators')[0].querySelectorAll('.carousel-dot').forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === flipaIndex);
+      });
+    }
+
+    function aeCarousel(direction) {
+      aeIndex = (aeIndex + direction + aeSteps.length) % aeSteps.length;
+      updateAeCarousel();
+    }
+
+    function aeGoTo(index) {
+      aeIndex = index;
+      updateAeCarousel();
+    }
+
+    function updateAeCarousel() {
+      const step = aeSteps[aeIndex];
+      document.getElementById('aeCarouselImage').src = step.image;
+      document.getElementById('aeStepTitle').textContent = step.title;
+      document.getElementById('aeStepDesc').textContent = step.desc;
+      
+      document.querySelectorAll('.carousel-indicators')[1].querySelectorAll('.carousel-dot').forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === aeIndex);
+      });
+    }
+
+    // Week card embed generation
+    (function () {
+      var cards = document.querySelectorAll('.week-card');
+      cards.forEach(function (card) {
+        var target = card.querySelector('.week-embed');
+        var videoId = (card.getAttribute('data-video-id') || '').trim();
+        var week = card.getAttribute('data-week');
+
+        if (videoId) {
+          var frame = document.createElement('iframe');
+          frame.src = 'https://www.youtube.com/embed/' + encodeURIComponent(videoId);
+          frame.title = 'Week ' + week + ' submission';
+          frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+          frame.allowFullscreen = true;
+          frame.style.border = '0';
+          target.appendChild(frame);
+        } else {
+          var placeholder = document.createElement('div');
+          placeholder.className = 'placeholder';
+          placeholder.textContent = 'Week ' + week + ': YouTube embed placeholder';
+          target.appendChild(placeholder);
+        }
+      });
+    })();
+
+    // Flash message system
+    function showFlashMessage(message, type = 'error') {
+      const container = document.getElementById('flash-message-container');
+      if (!container) return;
+      
+      const div = document.createElement('div');
+      div.className = 'flash-message';
+      div.textContent = message;
+      container.appendChild(div);
+      
+      setTimeout(() => {
+        div.remove();
+      }, 4000);
+    }
+
+    // Check for flash messages in sessionStorage
+    window.addEventListener('DOMContentLoaded', () => {
+      const flashMsg = sessionStorage.getItem('flashMessage');
+      if (flashMsg) {
+        showFlashMessage(flashMsg);
+        sessionStorage.removeItem('flashMessage');
+      }
+    });
+
+    // URL validation
+    const validPages = ['index.html', 'rotoscope.html', 'solarsystem.html', ''];
+    const currentPage = window.location.pathname.split('/').pop();
+    
+    if (!validPages.includes(currentPage) && currentPage !== '') {
+      sessionStorage.setItem('flashMessage', '✗ Page not found. Redirecting to home...');
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Not Found - ITCI231</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(150deg, #f7f3ec 0%, #f9f8f4 45%, #f0fbff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    
+    .container {
+      text-align: center;
+      background: white;
+      padding: 3rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin: 0 0 0.5rem;
+      color: #c54242;
+    }
+    
+    p {
+      font-size: 1.1rem;
+      color: #666;
+      margin: 0.5rem 0 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>404</h1>
+    <p>Page not found</p>
+    <p>Redirecting to home...</p>
+  </div>
+
+  <script>
+    // Set flash message and redirect
+    sessionStorage.setItem('flashMessage', '✗ Page not found. Redirecting to home...');
+    
+    // Redirect to index.html after a short delay to ensure sessionStorage is set
+    setTimeout(() => {
+      // Get the directory path and redirect to index.html
+      const pathParts = window.location.pathname.split('/').filter(p => p);
+      pathParts.pop(); // Remove the 404.html
+      const dirPath = '/' + pathParts.join('/') + '/';
+      window.location.href = window.location.origin + dirPath + 'index.html';
+    }, 100);
+  </script>
+</body>
+</html>
