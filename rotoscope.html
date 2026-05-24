@@ -153,12 +153,22 @@
       background: linear-gradient(140deg, #11263d, #182e48);
     }
 
-    .video-wrapper iframe {
+    /* Only absolutely position a direct iframe child (old single-embed layout).
+       Nested or sibling iframe elements (compare players) should not be forced
+       into absolute positioning. */
+    .video-wrapper > iframe {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
       border: 0;
+    }
+
+    /* When using the compare UI we disable the aspect-ratio padding so the
+       inner compare container can size naturally. */
+    .video-wrapper.compare-mode {
+      padding-top: 0;
+      padding-bottom: 0;
     }
 
     .video-description {
@@ -646,8 +656,30 @@
         <p class="video-credits">Gangsta - Kehlani / Jane Kim Choreography | LOKI DANCE COVER | AETERNA</p>
       </div>
 
-      <div class="video-wrapper">
-        <iframe src="https://www.youtube-nocookie.com/embed/deoewZPRfKo?modestbranding=1&rel=0&showinfo=0" title="Reference video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <div class="video-wrapper compare-mode">
+        <div class="compare-container" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="compare-player">
+            <div style="font-weight:700;margin-bottom:0.6rem;">Reference (YouTube)</div>
+            <div id="refPlayer" style="width:100%;height:360px;background:#000;border-radius:12px;overflow:hidden;"></div>
+          </div>
+
+          <div class="compare-player">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">
+              <div style="font-weight:700;">Compare (YouTube)</div>
+              <div style="font-size:0.85rem;color:#114f86;">Loaded from provided link</div>
+            </div>
+            <div id="compPlayer" style="width:100%;height:360px;background:#000;border-radius:12px;overflow:hidden;"></div>
+          </div>
+        </div>
+
+        <div class="compare-controls" style="display:flex;gap:0.6rem;margin-top:1rem;align-items:center;">
+          <button id="playBoth" style="padding:8px 12px;border-radius:8px;">Play</button>
+          <button id="pauseBoth" style="padding:8px 12px;border-radius:8px;">Pause</button>
+          <label style="display:flex;align-items:center;gap:0.4rem;color:var(--muted);font-size:0.95rem;margin-left:8px;">
+            <input id="syncToggle" type="checkbox" checked /> Sync
+          </label>
+          <div style="margin-left:auto;color:var(--muted);font-size:0.95rem;">Tip: upload an MP4/WEBM for the right player.</div>
+        </div>
       </div>
 
       <div class="video-description">
@@ -937,6 +969,79 @@
       sessionStorage.setItem('flashMessage', '✗ Page not found. Redirecting to home...');
       window.location.href = 'index.html';
     }
+    
+    // --- Side-by-side compare + sync logic (two YouTube players) ---
+    (function () {
+      const REF_YT_ID = 'deoewZPRfKo'; // original project reference (restored)
+      const COMP_YT_ID = 'iI5iUttfGP0'; // compare video (user-provided)
+      let refPlayer = null, compPlayer = null;
+      const playBtn = document.getElementById('playBoth');
+      const pauseBtn = document.getElementById('pauseBoth');
+      const syncToggle = document.getElementById('syncToggle');
+
+      // Load YouTube IFrame API
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      const firstScript = document.getElementsByTagName('script')[0];
+      firstScript.parentNode.insertBefore(tag, firstScript);
+
+      window.onYouTubeIframeAPIReady = function () {
+        refPlayer = new YT.Player('refPlayer', {
+          height: '360', width: '100%', videoId: REF_YT_ID,
+          playerVars: { controls: 1, rel: 0, modestbranding: 1, playsinline: 1 },
+          events: { onReady: () => { }, onStateChange: () => { } }
+        });
+
+        compPlayer = new YT.Player('compPlayer', {
+          height: '360', width: '100%', videoId: COMP_YT_ID,
+          playerVars: { controls: 1, rel: 0, modestbranding: 1, playsinline: 1 },
+          events: { onReady: () => { }, onStateChange: () => { } }
+        });
+      };
+
+      playBtn.addEventListener('click', function () {
+        if (refPlayer && refPlayer.playVideo) refPlayer.playVideo();
+        if (compPlayer && compPlayer.playVideo) compPlayer.playVideo();
+        startSyncLoop();
+      });
+
+      pauseBtn.addEventListener('click', function () {
+        if (refPlayer && refPlayer.pauseVideo) refPlayer.pauseVideo();
+        if (compPlayer && compPlayer.pauseVideo) compPlayer.pauseVideo();
+        stopSyncLoop();
+      });
+
+      let syncInterval = null;
+      function startSyncLoop() {
+        if (syncInterval) return;
+        syncInterval = setInterval(function () {
+          if (!syncToggle.checked || !refPlayer || !compPlayer) return;
+          const t1 = (refPlayer.getCurrentTime && refPlayer.getCurrentTime()) || 0;
+          const t2 = (compPlayer.getCurrentTime && compPlayer.getCurrentTime()) || 0;
+          const diff = Math.abs(t1 - t2);
+          if (diff > 0.25) {
+            // bring the compare player in sync with reference
+            try { compPlayer.seekTo(t1, true); } catch (e) { }
+          }
+        }, 250);
+      }
+
+      function stopSyncLoop() { if (syncInterval) { clearInterval(syncInterval); syncInterval = null; } }
+
+      // start/stop loop based on players' state periodically
+      setInterval(function () {
+        if (!syncToggle.checked) return;
+        if (!refPlayer || !compPlayer) return;
+        try {
+          const s1 = refPlayer.getPlayerState();
+          const s2 = compPlayer.getPlayerState();
+          if (s1 === YT.PlayerState.PLAYING || s2 === YT.PlayerState.PLAYING) startSyncLoop();
+          else stopSyncLoop();
+        } catch (e) { }
+      }, 500);
+
+      window.addEventListener('beforeunload', function () { stopSyncLoop(); });
+    })();
   </script>
 </body>
 
