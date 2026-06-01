@@ -7,5 +7,4 @@ https://alwincroissant.github.io/multimediaproj/
 
 Pages included:
 - Home
-- Rotoscoping (with Week 1-12 embed-ready cards)
 - Solar System
