@@ -138,7 +138,7 @@
     }
 
     .calculator-panel {
-      animation: enter 0.7s 0.1s ease both;
+      animation: enter 0.7s 0.2s ease both;
     }
 
     .input-row {
@@ -267,7 +267,7 @@
     }
 
     .overview-panel {
-      animation: enter 0.7s 0.2s ease both;
+      animation: enter 0.7s 0.1s ease both;
     }
 
     .overview-stats {
@@ -312,46 +312,125 @@
       padding: 1rem;
     }
 
-    /* Grid to display the four step images for "How this was created" */
-    .how-grid {
+    /* Carousel Styles */
+    .carousel-container {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0.6rem;
-      margin-top: 0.85rem;
+      gap: 1.2rem;
+      margin-top: 1rem;
     }
 
-    .how-step {
-      border: 1px solid rgba(18, 38, 61, 0.08);
-      border-radius: 10px;
+    .carousel-main {
+      position: relative;
+      border: 1px solid rgba(18, 38, 61, 0.12);
+      border-radius: 14px;
       overflow: hidden;
-      background: rgba(255,255,255,0.95);
-      text-align: center;
-      padding: 0.35rem;
+      background: rgba(255, 255, 255, 0.95);
     }
 
-    .how-step img {
+    .carousel-image {
       width: 100%;
-      height: 140px;
-      object-fit: cover;
+      height: 400px;
+      object-fit: contain;
+      background: linear-gradient(135deg, #ecf4fb, #eaf8f3);
       display: block;
-      border-radius: 6px;
-      margin-bottom: 0.45rem;
     }
 
-    .how-step figcaption {
-      font-size: 0.86rem;
-      color: #34506a;
+    .carousel-controls {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 1rem;
+      pointer-events: none;
+    }
+
+    .carousel-btn {
+      pointer-events: auto;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(18, 38, 61, 0.2);
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--ink);
+      font-size: 1.4rem;
       font-weight: 700;
-      margin-top: 0.1rem;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: background 0.25s ease, transform 0.25s ease;
+      box-shadow: 0 4px 12px rgba(18, 38, 61, 0.1);
+    }
+
+    .carousel-btn:hover {
+      background: rgba(67, 137, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    .carousel-info {
+      padding: 1.2rem;
+      background: linear-gradient(135deg, rgba(67, 137, 255, 0.08), rgba(39, 179, 159, 0.08));
+      border-top: 1px solid rgba(18, 38, 61, 0.08);
+      border-radius: 8px;
+    }
+
+    .carousel-step {
+      font-family: "Fraunces", serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .carousel-description {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .carousel-indicators {
+      padding: 0 1.2rem 0.8rem;
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .carousel-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1px solid rgba(18, 38, 61, 0.2);
+      background: rgba(18, 38, 61, 0.1);
+      cursor: pointer;
+      transition: background 0.25s ease;
+    }
+
+    .carousel-dot.active {
+      background: var(--ink);
     }
 
     @media (max-width: 900px) {
-      .how-grid { grid-template-columns: repeat(2, 1fr); }
+      .carousel-image {
+        height: 300px;
+      }
     }
 
-    @media (max-width: 480px) {
-      .how-grid { grid-template-columns: 1fr; }
-      .how-step img { height: 200px; }
+    @media (max-width: 640px) {
+      .carousel-image {
+        height: 250px;
+      }
+
+      .carousel-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 1.2rem;
+      }
+
+      .carousel-info {
+        padding: 1rem;
+      }
     }
 
     .how-created h4 {
@@ -365,20 +444,6 @@
       margin-top: 0.4rem;
       font-size: 0.92rem;
       color: #4e637a;
-    }
-
-    .how-created ol {
-      margin: 0.75rem 0 0;
-      padding-left: 1.2rem;
-      display: grid;
-      gap: 0.55rem;
-    }
-
-    .how-created li {
-      color: #3f566d;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      padding: 0.15rem 0;
     }
 
     .how-created-note {
@@ -701,6 +766,53 @@
       </div>
     </section>
 
+    <section class="panel overview-panel">
+      <h2 class="section-title"><span>Project Overview</span></h2>
+      <div class="overview-stats">
+        <article class="stat-card">
+          <h3>Tools Used</h3>
+          <p>Blender 5.1, BlenderKit (textures), Python 3.11</p>
+        </article>
+        <article class="stat-card">
+          <h3>Render Time</h3>
+          <p>2 Hours</p>
+        </article>
+        <article class="stat-card">
+          <h3>Resolution</h3>
+          <p>1920 x 1080 (1080p)</p>
+        </article>
+      </div>
+      <div class="overview-copy">
+        <p>This animation blends visual storytelling and scientific timing. Each planetary body rotates and revolves with values based on real orbital references while preserving cinematic readability.</p>
+        <p>Python scripting was used to automate orbital speed control, scene timing, and position accuracy so that each sequence stays consistent during rendering and compositing.</p>
+        <div class="how-created" aria-hidden="false">
+          <h4>How this was created</h4>
+          <p class="how-created-intro">Simple pipeline used for each celestial body project:</p>
+          <div class="carousel-container">
+            <div class="carousel-main">
+              <img id="blenderCarouselImage" src="blendersteps/step1.jpg" alt="Blender step" class="carousel-image">
+              <div class="carousel-controls">
+                <button class="carousel-btn" onclick="blenderCarousel(-1)">‹</button>
+                <button class="carousel-btn" onclick="blenderCarousel(1)">›</button>
+              </div>
+            </div>
+            <div class="carousel-info">
+              <div class="carousel-step" id="blenderStepTitle">Step 1: Download/Create Scripts</div>
+              <div class="carousel-description" id="blenderStepDesc">Create a Python script that generates a spinning planet, or download the script from the project links.</div>
+            </div>
+            <div class="carousel-indicators">
+              <button class="carousel-dot active" onclick="blenderGoTo(0)"></button>
+              <button class="carousel-dot" onclick="blenderGoTo(1)"></button>
+              <button class="carousel-dot" onclick="blenderGoTo(2)"></button>
+              <button class="carousel-dot" onclick="blenderGoTo(3)"></button>
+            </div>
+          </div>
+
+          <p class="how-created-note">Tools used: Blender 5.1, BlenderKit for textures, and Python for scripting.</p>
+        </div>
+      </div>
+    </section>
+
     <section class="panel calculator-panel">
       <h2 class="section-title"><span>Planetary Age Calculator</span></h2>
       <p class="section-note">Enter your age in Earth years to see your equivalent age across other planetary orbits.</p>
@@ -711,59 +823,6 @@
       <div id="ageValidation" class="validation-msg" role="status" aria-live="polite"></div>
       <div id="ageResults" class="age-results" aria-live="polite">
         <div id="planetAges" class="age-grid"></div>
-      </div>
-    </section>
-
-    <section class="panel overview-panel">
-      <h2 class="section-title"><span>Project Overview</span></h2>
-      <div class="overview-stats">
-        <article class="stat-card">
-          <h3>Tools Used</h3>
-          <p>Blender 5.1, BlenderKit (textures), Python 3.11</p>
-        </article>
-        <article class="stat-card">
-          <h3>Render Time</h3>
-          <p>48 Minutes</p>
-        </article>
-        <article class="stat-card">
-          <h3>Resolutionll</h3>
-          <p>1920 x 1080 (1080p)</p>
-        </article>
-      </div>
-      <div class="overview-copy">
-        <p>This animation blends visual storytelling and scientific timing. Each planetary body rotates and revolves with values based on real orbital references while preserving cinematic readability.</p>
-        <p>Python scripting was used to automate orbital speed control, scene timing, and position accuracy so that each sequence stays consistent during rendering and compositing.</p>
-        <div class="how-created" aria-hidden="false">
-          <h4>How this was created</h4>
-          <p class="how-created-intro">Simple pipeline used for each celestial body project:</p>
-          <ol>
-            <li>Create a Python script that generates a spinning planet.</li>
-            <li>Open Blender and run the script first by going to the Scripting tab. (Make sure to delete everything in the scene first.)</li>
-            <li>Use BlenderKit (press N in the 3D Viewport and open the BlenderKit menu) to apply your own textures.</li>
-            <li>Render and enjoy.</li>
-          </ol>
-
-          <div class="how-grid" aria-hidden="false">
-            <figure class="how-step">
-              <img src="blendersteps/step1.jpg" alt="Step 1 — Prepare Blender">
-              <figcaption>Step 1 — Download Scripts</figcaption>
-            </figure>
-            <figure class="how-step">
-              <img src="blendersteps/step2.jpg" alt="Step 2 — Run script">
-              <figcaption>Step 2 — Run Script</figcaption>
-            </figure>
-            <figure class="how-step">
-              <img src="blendersteps/step3.jpg" alt="Step 3 — Apply textures">
-              <figcaption>Step 3 — Apply Textures</figcaption>
-            </figure>
-            <figure class="how-step">
-              <img src="blendersteps/step4.jpg" alt="Step 4 — Render">
-              <figcaption>Step 4 — Render</figcaption>
-            </figure>
-          </div>
-
-          <p class="how-created-note">Tools used: Blender 5.1, BlenderKit for textures, and Python for scripting.</p>
-        </div>
       </div>
     </section>
 
@@ -1307,6 +1366,54 @@
     });
 
     generateCelestialBodies();
+
+    // Blender Step Carousel Logic
+    const blenderSteps = [
+      {
+        image: 'blendersteps/step1.jpg',
+        title: 'Step 1: Download/Create Scripts',
+        desc: 'Create a Python script that generates a spinning planet, or download the script from the project links.'
+      },
+      {
+        image: 'blendersteps/step2.jpg',
+        title: 'Step 2: Run Script',
+        desc: 'Open Blender and run the script by going to the Scripting tab. (Make sure to delete everything in the scene first.)'
+      },
+      {
+        image: 'blendersteps/step3.jpg',
+        title: 'Step 3: Apply Textures',
+        desc: 'Use BlenderKit (press N in the 3D Viewport and open the BlenderKit menu) to search and apply your own textures.'
+      },
+      {
+        image: 'blendersteps/step4.jpg',
+        title: 'Step 4: Render',
+        desc: 'Render the final scene and enjoy the animation.'
+      }
+    ];
+
+    let blenderIndex = 0;
+
+    function blenderCarousel(direction) {
+      blenderIndex = (blenderIndex + direction + blenderSteps.length) % blenderSteps.length;
+      updateBlenderCarousel();
+    }
+
+    function blenderGoTo(index) {
+      blenderIndex = index;
+      updateBlenderCarousel();
+    }
+
+    function updateBlenderCarousel() {
+      const step = blenderSteps[blenderIndex];
+      document.getElementById('blenderCarouselImage').src = step.image;
+      document.getElementById('blenderStepTitle').textContent = step.title;
+      document.getElementById('blenderStepDesc').textContent = step.desc;
+      
+      document.querySelectorAll('.carousel-indicators .carousel-dot').forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === blenderIndex);
+      });
+    }
+
 
     // Flash message system
     function showFlashMessage(message, type = 'error') {

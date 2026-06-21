@@ -242,6 +242,17 @@
       gap: 1rem;
     }
 
+    .carousel-sidebar {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      gap: 0.8rem;
+    }
+
+    .carousel-sidebar .carousel-info {
+      flex: 1;
+    }
+
     .carousel-main {
       position: relative;
       border: 1px solid rgba(21, 38, 58, 0.12);
@@ -1075,7 +1086,7 @@
             <button class="carousel-btn" onclick="flipaCarousel(1)">›</button>
           </div>
         </div>
-        <div>
+        <div class="carousel-sidebar">
           <div class="carousel-info">
             <div class="carousel-step" id="flipaStepTitle">Step 1: Open FlipaClip and create a new project</div>
             <div class="carousel-description" id="flipaStepDesc">Open FlipaClip and create a new project to get started with your rotoscoping animation.</div>
