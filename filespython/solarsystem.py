@@ -16,6 +16,9 @@ for name in PRESERVED_NAMES:
         # Clear existing animations so we can write fresh keyframes
         if obj.animation_data:
             obj.animation_data_clear()
+        # Force visibility in viewport and render
+        obj.hide_viewport = False
+        obj.hide_render = False
 
 # Delete all other objects safely
 objects_to_delete = [obj for obj in bpy.data.objects if obj.name not in PRESERVED_NAMES]
@@ -185,7 +188,7 @@ R_PLUTO   = planet_radii["Pluto"]
 D_MERCURY = planet_dists["Mercury"]
 D_VENUS   = planet_dists["Venus"]
 D_EARTH   = planet_dists["Earth"]
-D_MOON    = 1.4
+D_MOON    = 0.75
 D_ISS     = 0.58
 D_MARS    = planet_dists["Mars"]
 D_JUPITER = planet_dists["Jupiter"]
@@ -366,6 +369,8 @@ def create_planet(name, radius, distance, orbit_revs, desired_spin_revs):
     # Parent body to orbit and explicitly set local location to center it on the orbit radius
     body.parent = orbit
     body.location = (distance, 0, 0)
+    body.hide_viewport = False
+    body.hide_render = False
     
     # Orbit Animation
     orbit.rotation_euler = (0, 0, 0)
@@ -669,6 +674,9 @@ else:
     sun.name = "Sun"
     smooth_object(sun)
     apply_material(sun, "sun", is_sun=True)
+# Force visibility in viewport and render
+sun.hide_viewport = False
+sun.hide_render = False
 # Tilt Sun by 7.25 degrees and animate spin (1.5 turns in world space)
 tilt_sun = math.radians(7.25)
 sun.rotation_euler = (tilt_sun, 0, 0)
@@ -723,6 +731,8 @@ else:
 # Parent Moon to Moon_Orbit and set local coordinates
 moon_body.parent = moon_orbit
 moon_body.location = (D_MOON, 0, 0)
+moon_body.hide_viewport = False
+moon_body.hide_render = False
 
 # Tilt Moon relative to its orbit plane (6.68 degrees)
 moon_body.rotation_euler = (math.radians(6.68), 0, 0)
@@ -844,20 +854,44 @@ fill_light.location = (0, 0, 50)
 # ==========================================
 
 stages = [
-    ("Sun", 1, 70),
-    ("Mercury", 110, 150),
-    ("Venus", 190, 230),
-    ("Earth", 270, 390),
-    ("Mars", 430, 470),
-    ("Jupiter", 510, 550),
-    ("Saturn", 590, 630),
-    ("Uranus", 670, 710),
-    ("Neptune", 750, 790),
-    ("Pluto", 830, 870),
-    ("Wide", 930, 1440)
+    ("Sun", 1, 35),
+    ("Mercury", 65, 100),
+    ("Venus", 130, 165),
+    ("Earth", 195, 265),
+    ("Mars", 295, 330),
+    ("Jupiter", 360, 395),
+    ("Saturn", 425, 460),
+    ("Uranus", 490, 525),
+    ("Neptune", 555, 590),
+    ("Pluto", 620, 655),
+    ("Cinematic", 720, 1080),
+    ("Wide", 1080, 1440)
 ]
 
+def get_cinematic_pos(F):
+    F_clamped = max(720, min(1080, F))
+    t = (F_clamped - 720) / 360.0
+    
+    P0 = mathutils.Vector((38.0, 28.0, 10.0))
+    P1 = mathutils.Vector((-14.0, -10.0, 2.0))
+    P2 = mathutils.Vector((0.0, -115.0, 70.0))
+    
+    cam_pos = (1.0 - t)**2 * P0 + 2.0 * (1.0 - t) * t * P1 + t**2 * P2
+    
+    # We query target positions at F_clamped
+    T0 = get_world_pos("Saturn", F_clamped)
+    T1 = get_world_pos("Earth", F_clamped)
+    T2 = mathutils.Vector((0.0, 0.0, 0.0))
+    
+    target_pos = (1.0 - t)**2 * T0 + 2.0 * (1.0 - t) * t * T1 + t**2 * T2
+    
+    return target_pos, cam_pos
+
 def get_world_pos(name, F):
+    if name == "Cinematic":
+        target_pos, _ = get_cinematic_pos(F)
+        return target_pos
+        
     if name == "Sun" or name == "Wide":
         return mathutils.Vector((0.0, 0.0, 0.0))
         
@@ -870,12 +904,16 @@ def get_world_pos(name, F):
     return mathutils.Vector((D * math.cos(angle_rad), D * math.sin(angle_rad), 0.0))
 
 def get_camera_focus_pos(name, F):
+    if name == "Cinematic":
+        _, cam_pos = get_cinematic_pos(F)
+        return cam_pos
+        
     if name == "Sun":
-        return mathutils.Vector((0.0, -18.0, 7.0))
+        return mathutils.Vector((0.0, -22.0, 9.0))
         
     if name == "Wide":
-        # Slowly rotating wide shot (using new start frame 930)
-        angle_rad = math.radians((F - 930) * 0.25)
+        # Slowly rotating wide shot (using new start frame 1080)
+        angle_rad = math.radians((F - 1080) * 0.25)
         r_wide = 115.0
         return mathutils.Vector((r_wide * math.sin(angle_rad), -r_wide * math.cos(angle_rad), 70.0))
         
@@ -890,9 +928,12 @@ def get_camera_focus_pos(name, F):
     alpha = (3.0 * R) / D if D != 0 else 0.0
     phi = theta - alpha
     
-    x = (D - 3.5 * R) * math.cos(phi)
-    y = (D - 3.5 * R) * math.sin(phi)
-    z = R * 1.6
+    cam_dist_factor = 7.2 if name == "Earth" else 5.5
+    cam_z_factor = 2.8 if name == "Earth" else 2.2
+    
+    x = (D - cam_dist_factor * R) * math.cos(phi)
+    y = (D - cam_dist_factor * R) * math.sin(phi)
+    z = R * cam_z_factor
     
     return mathutils.Vector((x, y, z))
 
